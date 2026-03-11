@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+:root {
+  /* === BRAND COLORS === */
+  --primary: #007bff;
+  --secondary: #0056b3;
+  --tertiary: #3395ff;
+
+  /* === SURFACES (BACKGROUNDS) === */
+  --surface-base: #121212;
+  --surface-section: #242424;
+  --surface-elevated: #2d2d2d;
+
+  --surface-input: #202020;
+  --surface-footer: #0d0d0d;
+
+  /* === CHAT SURFACES === */
+  --surface-message-user: #2d323a;
+  --surface-message-answer: #1e6b45;
+  --surface-message-system: #2a2a2a;
+
+  /* === BORDERS === */
+  --border-default: #3a3a3a;
+  --border-input: #404040;
+
+  --border-message-user: #3a3a3a;
+  --border-message-answer: #2a8a57;
+  --border-message-system: #3a3a3a;
+
+  /* === TEXT / FOREGROUND === */
+  --foreground-primary: #e6e6e6;
+  --foreground-secondary: #a0a0a0;
+  --foreground-muted: #7a7a7a;
+
+  /* === STATES === */
+  --hover: #333333;
+  --active: #3d3d3d;
+
+  --error: #ff4d4d;
+  --success: #2ea043;
+
+  /* === ELEVATION === */
+  --shadow-light: 0 4px 12px rgba(255, 255, 255, 0.05);
+  --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* === OVERLAY === */
+  --overlay-default: rgba(0, 0, 0, 0.6);
+}
+
+@theme inline {
+  /* === BRAND COLORS === */
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+
+  /* === SURFACES === */
+  --color-surface-base: var(--surface-base);
+  --color-surface-section: var(--surface-section);
+  --color-surface-elevated: var(--surface-elevated);
+
+  --color-surface-input: var(--surface-input);
+  --color-surface-footer: var(--surface-footer);
+
+  /* === CHAT SURFACES === */
+  --color-surface-message-user: var(--surface-message-user);
+  --color-surface-message-answer: var(--surface-message-answer);
+  --color-surface-message-system: var(--surface-message-system);
+
+  /* === BORDERS === */
+  --color-border-default: var(--border-default);
+  --color-border-input: var(--border-input);
+
+  --color-border-message-user: var(--border-message-user);
+  --color-border-message-answer: var(--color-border-message-answer);
+  --color-border-message-system: var(--border-message-system);
+
+  /* === TEXT === */
+  --color-foreground-primary: var(--foreground-primary);
+  --color-foreground-secondary: var(--foreground-secondary);
+  --color-foreground-muted: var(--foreground-muted);
+
+  /* === INTERACTION === */
+  --color-hover: var(--hover);
+  --color-active: var(--active);
+
+  --color-success: var(--success);
+  --color-error: var(--error);
+
+  /* === SHADOWS === */
+  --shadow-light: var(--shadow-light);
+  --shadow-medium: var(--light-medium);
+
+  /* === OVERLAY === */
+  --color-overlay-default: var(--overlay-default);
+}
+
+body {
+  min-height: 100vh;
+  background: var(--surface-base);
+  color: var(--foreground-primary);
+  font-family: Arial, Helvetica, sans-serif;
+}
