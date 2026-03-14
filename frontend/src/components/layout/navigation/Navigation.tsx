@@ -11,7 +11,8 @@ const Navigation = () => {
 
   useEffect(() => {
     const height = navRef?.current?.getBoundingClientRect().height;
-    setNavHeight(`[${height}px]`);
+    if (!height) return;
+    setNavHeight(`top-[${height}px]`);
   }, []);
 
   /* TODO: Zrobić smooth scroll do danej sekcji */
