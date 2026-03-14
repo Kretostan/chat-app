@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import List from "./List";
-import MobileList from "./MobileList";
+import Menu from "./Menu";
 import OutlineButton from "./OutlineButton";
 import PrimaryButton from "./PrimaryButton";
 import Title from "./Title";
@@ -24,10 +23,7 @@ const Navigation = () => {
     >
       <div className="relative flex justify-between items-center px-6 max-w-300 w-full">
         <Title />
-        <MobileList height={navHeight} />
-        <div className="md:static lg:absolute lg:left-1/2 lg:-translate-x-1/2 hidden md:block">
-          <List />
-        </div>
+        <Menu height={navHeight} />
         <div className="flex gap-2 md:gap-4 py-4">
           <OutlineButton>Login</OutlineButton>
           <PrimaryButton>Sign Up</PrimaryButton>
