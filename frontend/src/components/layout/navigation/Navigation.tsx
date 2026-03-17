@@ -5,16 +5,15 @@ import PrimaryButton from "./PrimaryButton";
 import Title from "./Title";
 
 const Navigation = () => {
-  const [navHeight, setNavHeight] = useState<string | undefined>(undefined);
-  const navRef = useRef<HTMLDivElement>(null);
+	const [navHeight, setNavHeight] = useState<number | undefined>(undefined);
+	const navRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const height = navRef?.current?.getBoundingClientRect().height;
-    if (!height) return;
-    setNavHeight(`top-[${height}px]`);
-  }, []);
+	useEffect(() => {
+		const height = navRef?.current?.getBoundingClientRect().height;
+		setNavHeight(height);
+	}, []);
 
-  /* TODO: Zrobić smooth scroll do danej sekcji */
+	/* TODO: Zrobić smooth scroll do danej sekcji */
 
   return (
     <nav
