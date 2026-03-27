@@ -7,6 +7,5 @@ export const useMobile = (): boolean => {
 			return () => window.removeEventListener("resize", callback);
 		},
 		() => window.innerWidth < 768,
-		() => false,
 	);
 };
