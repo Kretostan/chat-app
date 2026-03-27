@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 export const useMobile = (): boolean => {
-  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
-  useEffect(() => {
-    window.addEventListener("resize", () =>
-      setIsMobile(window.innerWidth <= 768),
-    );
-  }, []);
-
-  return isMobile;
+	return useSyncExternalStore(
+		(callback) => {
+			window.addEventListener("resize", callback);
+			return () => window.removeEventListener("resize", callback);
+		},
+		() => window.innerWidth < 768,
+		() => false,
+	);
 };
