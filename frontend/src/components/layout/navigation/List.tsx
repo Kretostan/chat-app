@@ -40,7 +40,7 @@ const itemVariants = {
 
 const hoverEffect = { color: "var(--primary)" };
 
-const List = ({ height }: { height: number | undefined }) => {
+const List = ({ height }: { height?: number | undefined }) => {
 	const isMobile = useMobile();
 
 	const styles = isMobile
