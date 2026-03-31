@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useMobile } from "@/hooks";
 
 const sections = [
 	{ label: "Features", href: "#features" },
@@ -7,19 +8,61 @@ const sections = [
 	{ label: "Contact", href: "#contact" },
 ];
 
-const hoverEffect = { color: "var(--primary)" };
-
-type ListProps = {
-	height?: number | undefined;
+const menuVariants = {
+	initial: (isMobile: boolean) => ({
+		opacity: isMobile ? 0 : 1,
+		height: isMobile ? 0 : "auto",
+	}),
+	animate: {
+		opacity: 1,
+		height: "auto",
+		transition: {
+			staggerChildren: 0.1,
+		},
+	},
+	exit: (isMobile: boolean) => ({
+		opacity: isMobile ? 0 : 1,
+		height: isMobile ? 0 : "auto",
+	}),
 };
 
-const List = ({ height }: ListProps) => {
+const itemVariants = {
+	initial: (isMobile: boolean) => ({
+		opacity: isMobile ? 0 : 1,
+	}),
+	animate: {
+		opacity: 1,
+	},
+	exit: (isMobile: boolean) => ({
+		opacity: isMobile ? 0 : 1,
+	}),
+};
+
+const hoverEffect = { color: "var(--primary)" };
+
+const List = ({ height }: { height: number | undefined }) => {
+	const isMobile = useMobile();
+
+	const styles = isMobile
+		? `gap-8 flex-col absolute left-0 w-full bg-surface-section`
+		: "gap-6 lg:gap-12 flex-row justify-center static lg:absolute lg:left-1/2 lg:-translate-x-1/2";
+	const inlineStyles = isMobile ? { top: `${height}px` } : {};
+
 	return (
-		<ul
-			className={`absolute md:static top-[${height}px] left-0 flex flex-col md:flex-row gap-8 p-6 bg-surface-section w-full z-998`}
+		<motion.ul
+			layout
+			custom={isMobile}
+			variants={menuVariants}
+			initial="initial"
+			animate="animate"
+			exit="exit"
+			className={`flex p-6 overflow-hidden ${styles}`}
+			style={inlineStyles}
 		>
 			{sections.map((section) => (
 				<motion.li
+					custom={isMobile}
+					variants={itemVariants}
 					whileHover={hoverEffect}
 					className="cursor-pointer"
 					key={section.label}
@@ -27,7 +70,7 @@ const List = ({ height }: ListProps) => {
 					<a href={section.href}>{section.label}</a>
 				</motion.li>
 			))}
-		</ul>
+		</motion.ul>
 	);
 };
 

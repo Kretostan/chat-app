@@ -11,7 +11,6 @@ const Navigation = () => {
 	const isMobile = useMobile();
 	const navHeight = useElementHeight(navRef);
 
-	/* TODO: Zrobić smooth scroll do danej sekcji */
 	return (
 		<nav
 			className="fixed top-0 flex justify-center items-center w-full bg-surface-section border-b border-border-default shadow-[0_0_10px_2px_black] z-1000"
