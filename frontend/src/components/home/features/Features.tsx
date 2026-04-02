@@ -5,7 +5,7 @@ const Features = () => {
   return (
     <section
       id="features"
-      className="flex flex-col items-center scroll-mt-20 bg-surface-section w-full px-6 text-center pt-20 pb-16"
+      className="flex flex-col items-center px-6 pt-20 pb-16 scroll-mt-20 w-full bg-surface-section text-center"
     >
       <div>
         <h4 className="text-3xl/12 md:text-5xl/18 font-bold">
