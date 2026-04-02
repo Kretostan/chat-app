@@ -94,6 +94,10 @@
   --color-overlay-default: var(--overlay-default);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   min-height: 100vh;
   background: var(--surface-base);
