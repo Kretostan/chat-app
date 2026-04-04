@@ -8,13 +8,16 @@ const PrimaryButton = ({ children }: PrimaryButtonProps) => {
   return (
     <motion.button
       initial={{
+        y: 0,
+        color: "var(--foreground-primary)",
+        backgroundColor: "var(--primary)",
         boxShadow: "none",
       }}
       whileHover={{
-        y: -3,
-        color: "var(--text-primary)",
+        y: -1,
+        color: "var(--foreground-primary)",
         backgroundColor: "rgba(0, 123 ,255, 0.8)",
-        boxShadow: "0 0 15px 1px var(--primary)",
+        boxShadow: "0 0 10px 1px var(--primary)",
       }}
       className="py-3 w-20 md:w-24 bg-primary text-sm md:text-base text-white font-medium rounded-lg cursor-pointer"
     >
