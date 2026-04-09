@@ -41,13 +41,12 @@ const itemVariants = {
 
 const hoverEffect = { color: "var(--primary)" };
 
-const List = ({ height }: { height?: number | undefined }) => {
+const List = () => {
   const isMobile = useMobile();
 
   const styles = isMobile
-    ? `gap-8 flex-col absolute left-0 w-full bg-surface-section`
+    ? `top-20 gap-8 flex-col absolute left-0 w-full bg-surface-section`
     : "gap-6 lg:gap-12 flex-row justify-center static lg:absolute lg:left-1/2 lg:-translate-x-1/2";
-  const inlineStyles = isMobile ? { top: `${height}px` } : {};
 
   return (
     <motion.ul
@@ -58,7 +57,6 @@ const List = ({ height }: { height?: number | undefined }) => {
       animate="animate"
       exit="exit"
       className={`flex p-6 overflow-hidden ${styles}`}
-      style={inlineStyles}
     >
       {sections.map((section) => (
         <motion.li

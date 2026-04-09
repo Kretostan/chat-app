@@ -1,8 +1,7 @@
 import Copyright from "./Copyright";
 import FooterItem from "./FooterItem";
-import Socials from "./Socials";
 
-const Footer = () => {
+const Footer = ({ children }: { children?: React.ReactNode }) => {
   return (
     <section
       id="contact"
@@ -18,7 +17,7 @@ const Footer = () => {
         <FooterItem>Privacy</FooterItem>
         <FooterItem>Terms</FooterItem>
       </ul>
-      <Socials />
+      {children}
       <Copyright />
     </section>
   );
