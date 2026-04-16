@@ -21,7 +21,7 @@ function RouteComponent() {
     <>
       <Navigation>
         {isMobile ? <MobileList /> : <List />}
-        <PrimaryButton onClick={() => navigate({ to: "/auth" })}>Go in</PrimaryButton>
+        <PrimaryButton onClick={() => navigate({ to: "/auth/login" })}>Go in</PrimaryButton>
       </Navigation>
       <Hero />
       <main className="flex flex-col justify-center items-center">
