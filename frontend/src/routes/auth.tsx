@@ -1,18 +1,24 @@
 import Socials from "@/components/home/footer/Socials";
 import Footer from "@/components/layout/footer/Footer";
 import Navigation from "@/components/layout/navigation/Navigation";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/auth")({
-  component: RouteComponent,
-});
+export const Route = createFileRoute('/auth')({
+  beforeLoad: ({ location }) => {
+    if (location.pathname === "/auth") {
+      throw redirect({
+        to: "/auth/login",
+        replace: true
+      });
+    }
+  },
+  component: AuthLayout,
+})
 
-function RouteComponent() {
+function AuthLayout() {
   return <>
     <Navigation />
-    <div className="flex flex-col justify-center items-center min-h-screen">
-      <h2>Auth Page</h2>
-    </div>
+    <Outlet />
     <Footer>
       <Socials />
     </Footer>
