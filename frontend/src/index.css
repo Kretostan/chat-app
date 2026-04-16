@@ -3,6 +3,7 @@
 :root {
   /* === BRAND COLORS === */
   --primary: #007bff;
+  --primary-raw: 0, 123, 255;
   --secondary: #0056b3;
   --tertiary: #3395ff;
 
@@ -99,4 +100,10 @@ body {
   background: var(--surface-base);
   color: var(--foreground-primary);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 100px var(--tertiary) inset !important;
+  -webkit-text-fill-color: var(--foreground-primary) !important;
+  outline-color: var(--primary);
 }

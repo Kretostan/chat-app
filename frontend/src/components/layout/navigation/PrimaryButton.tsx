@@ -9,19 +9,15 @@ const PrimaryButton = ({ children, onClick }: PrimaryButtonProps) => {
   return (
     <motion.button
       initial={{
-        y: 0,
-        color: "var(--foreground-primary)",
-        backgroundColor: "var(--primary)",
-        boxShadow: "none",
+        backgroundColor: "rgba(var(--primary-raw), 1)",
+        boxShadow: "0 0 0px 0px var(--primary)",
       }}
       whileHover={{
-        y: -1,
-        color: "var(--foreground-primary)",
-        backgroundColor: "rgba(0, 123 ,255, 0.8)",
+        backgroundColor: "rgba(var(--primary-raw), 0.8)",
         boxShadow: "0 0 10px 1px var(--primary)",
       }}
       onClick={onClick}
-      className="py-3 w-20 md:w-24 bg-primary text-sm md:text-base text-white font-medium rounded-lg cursor-pointer"
+      className="py-3 w-20 md:w-24 bg-primary text-sm md:text-base text-foreground-primary font-medium rounded-lg shadow-none cursor-pointer"
     >
       {children}
     </motion.button>
