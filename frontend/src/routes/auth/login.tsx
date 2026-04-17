@@ -31,7 +31,7 @@ function RouteComponent() {
   const navigate = useNavigate({ from: "/auth" });
   const isMobile = useMobile();
 
-  const MotionLink = motion(Link);
+  const MotionLink = motion.create(Link);
 
   const isDisabled = values.login.length === 0 || values.password.length <= 5;
 
