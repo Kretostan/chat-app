@@ -2,9 +2,9 @@ node_modules
 
 dist
 
+.env
+.env.development
 !.env.example
-
-.env*
 
 .DS_Store
 
