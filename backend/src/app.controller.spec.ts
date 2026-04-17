@@ -12,10 +12,10 @@ describe("AppController", () => {
     }).compile();
   });
 
-  describe("getHello", () => {
-    it('should return "Hello World!"', () => {
+  describe("getUser", () => {
+    it('should return object with user name and surname', () => {
       const appController = app.get(AppController);
-      expect(appController.getHello()).toBe("Hello World!");
+      expect(appController.getUser()).toBe({ name: "John", surname: "Wick" });
     });
   });
 });
