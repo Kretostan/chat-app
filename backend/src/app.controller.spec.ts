@@ -15,7 +15,7 @@ describe("AppController", () => {
   describe("getUser", () => {
     it('should return object with user name and surname', () => {
       const appController = app.get(AppController);
-      expect(appController.getUser()).toBe({ name: "John", surname: "Wick" });
+      expect(appController.getUser()).toStrictEqual({ name: "John", surname: "Wick" });
     });
   });
 });
