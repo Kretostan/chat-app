@@ -16,7 +16,7 @@ export const Route = createFileRoute("/")({
 
 function RouteComponent() {
   const isMobile = useMobile();
-  const navigate = useNavigate({ from: "/" });
+  const navigate = useNavigate({ from: Route.fullPath });
   return (
     <>
       <Navigation>
