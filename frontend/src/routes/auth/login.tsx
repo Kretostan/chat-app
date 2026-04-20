@@ -1,112 +1,31 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import AuthPhoto from "@/assets/auth.png";
-import { motion } from "framer-motion";
-import { useMobile } from "@/hooks";
-import { useState, type SubmitEvent, type ChangeEvent, useRef } from "react";
-import WarningIcon from "@/assets/warning.svg?react";
-import { Link } from "@tanstack/react-router";
-
-const buttonVariants = {
-  enabled: {
-    backgroundColor: "var(--primary)",
-    color: "var(--foreground-primary)",
-    cursor: "pointer"
-  },
-  disabled: {
-    backgroundColor: "var(--secondary)",
-    color: "var(--foreground-muted)",
-    cursor: "not-allowed"
-  }
-}
+import Alert from "@/components/auth/Alert";
+import Footer from "@/components/auth/Footer";
+import Form from "@/components/auth/Form";
+import Header from "@/components/auth/Header";
+import Photo from "@/components/auth/login/Photo";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
 export const Route = createFileRoute('/auth/login')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const [values, setValues] = useState<{ login: string, password: string }>({ login: "", password: "" });
   const [hasError, setHasError] = useState<boolean>(false);
-  const loginRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate({ from: "/auth" });
-  const isMobile = useMobile();
-
-  const MotionLink = motion.create(Link);
-
-  const isDisabled = values.login.length === 0 || values.password.length <= 5;
-
-  const loginHandler = (event: SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const dummyResponse = {
-      code: 200
-    }
-    if (!isDisabled && dummyResponse.code === 200) {
-      navigate({ to: "/app" });
-    } else {
-      setHasError(true);
-    }
-  };
-
-  const valuesHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setValues(prevState => ({ ...prevState, [name]: value }))
-  }
 
   return <div className="flex justify-center items-center gap-20 min-h-screen my-22 md:my-0">
-    {!isMobile && <div className="rounded-2xl overflow-hidden outline-2 outline-tertiary">
-      <img src={AuthPhoto} width={600} />
-    </div>}
+    <Photo />
     <div className="flex flex-col justify-center items-center gap-3 w-90">
       <div className="flex flex-col justify-center items-center gap-6 px-8 py-10 w-full bg-surface-section border-3 border-border-default rounded-2xl">
-        <div className="flex flex-col justify-center items-center gap-3 py-4">
-          <h2 className="text-3xl text-primary font-bold">Chat App</h2>
-          <p>Login form description</p>
-        </div>
-        {hasError && <div className="flex items-center px-2 py-3 text-foreground-secondary text-xs border border-border-default rounded-lg">
-          <WarningIcon height={30} width={30} className="shrink-0 px-1.5" /><p>The login information you entered is incorrect. <MotionLink to="/auth/reset" whileHover={{ color: "var(--secondary)" }} className="text-tertiary cursor-pointer">Find your account and log in.</MotionLink></p>
-        </div>}
-        <form onSubmit={loginHandler} className="flex flex-col gap-10 w-full">
-          <div className="flex flex-col gap-4">
-            <input
-              ref={loginRef}
-              type="email"
-              name="login"
-              value={values.login}
-              placeholder="Username, or email"
-              onChange={(event) => valuesHandler(event)}
-              className="px-3 py-2 bg-surface-input outline-2 outline-border-input rounded-lg"
-            />
-            <input
-              ref={passwordRef}
-              type="password"
-              name="password"
-              value={values.password}
-              placeholder="Password"
-              autoComplete="new-password"
-              onChange={(event) => valuesHandler(event)}
-              className="px-3 py-2 bg-surface-input outline-2 outline-border-input rounded-lg"
-            />
-          </div>
-          <div className="flex flex-col items-center gap-6">
-            <motion.button
-              variants={buttonVariants}
-              initial={isDisabled ? "disabled" : "enabled"}
-              animate={isDisabled ? "disabled" : "enabled"}
-              className={`my-1 py-2 w-full ${isDisabled ? "bg-secondary text-foreground-muted cursor-not-allowed" : "bg-primary text-foreground-primary cursor-pointer"} font-semibold rounded-lg`}
-              disabled={isDisabled}
-            >
-              Log in
-            </motion.button>
-            <MotionLink to="/auth/reset" whileHover={{ color: "var(--primary)" }} className="text-secondary font-semibold cursor-pointer">
-              Forgot password?
-            </MotionLink>
-          </div>
-        </form>
+        <Header title="Chat App" description="Welcome back!" />
+        {hasError && <Alert description="The login information you entered is incorrect. " hasLink />}
+        <Form setError={setHasError} from="/auth/login" mode="login" />
       </div>
-      <div className="flex justify-center p-6 w-full bg-surface-section border-3 border-border-default rounded-2xl">
-        <p className="text-sm">Don't have an account? <MotionLink to="/auth/register" whileHover={{ color: "var(--secondary)" }} className="text-tertiary font-semibold cursor-pointer">Sign up</MotionLink></p>
-      </div>
+      <Footer
+        text="Don't have ana account?"
+        linkText="Sign up"
+        to="/auth/register"
+      />
     </div>
   </div>
 }
