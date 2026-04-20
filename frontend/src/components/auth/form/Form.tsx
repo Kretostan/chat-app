@@ -2,8 +2,8 @@ import { useAuthForm } from "@/hooks/useAuthForm";
 import { useNavigate } from "@tanstack/react-router";
 import { type Dispatch, type SetStateAction, type SubmitEvent } from "react";
 import { loginSchema, registerSchema } from "shared";
-import Button from "./form/Button";
-import Input from "./form/Input";
+import Button from "./Button";
+import Input from "./Input";
 
 interface FormProps {
   setError: Dispatch<SetStateAction<boolean>>;
