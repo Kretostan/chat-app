@@ -1,7 +1,7 @@
 import Alert from "@/components/auth/Alert";
 import BackButton from "@/components/auth/BackButton";
 import Footer from "@/components/auth/Footer";
-import Form from "@/components/auth/Form";
+import Form from "@/components/auth/form/Form";
 import Header from "@/components/auth/Header";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
