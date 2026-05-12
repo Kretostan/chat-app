@@ -1,24 +1,15 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ConfigService } from '@nestjs/config';
-import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
-
-  const whitelist = configService.get<string[]>("cors.whitelist");
+  const PORT = process.env.PORT ?? 3001;
 
   app.enableCors({
-    origin: (origin, callback) => {
-      if (!origin || whitelist.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowd by CORS"));
-      }
-    },
-  } as CorsOptions);
+    origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
+    credentials: true,
+  });
 
-  await app.listen(configService.get("PORT") || 3001);
+  await app.listen(PORT);
 }
 bootstrap();

@@ -1,3 +1,4 @@
+AGENTS.md
 node_modules
 
 dist
@@ -5,6 +6,10 @@ dist
 .env
 .env.development
 !.env.example
+
+.env*
+
+data/
 
 .DS_Store
 

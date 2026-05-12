@@ -1,29 +1,37 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-interface AppData {
-  name: string,
-  surname: string
+interface User {
+  id: number;
+  username: string;
+  email: string;
 }
 
-export const Route = createFileRoute('/app')({
-  loader: async (): Promise<AppData> => {
-    const url = import.meta.env.VITE_API_URL;
+export const Route = createFileRoute("/app")({
+  loader: async (): Promise<User[]> => {
+    const url = `${import.meta.env.VITE_API_URL}/users`;
 
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`)
+      throw new Error(`Response status: ${response.status}`);
     }
-    const result = await response.json();
-    return result;
+    return await response.json();
   },
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  const data = Route.useLoaderData();
+  const users = Route.useLoaderData();
 
-  return <div>
-    <h2>App Component</h2>
-    <p>Data - {data ? `${data.name} ${data.surname}` : "no data provided."}</p>
-  </div>
+  return (
+    <div>
+      <h2>Users</h2>
+      <ul>
+        {users.map((u) => (
+          <li key={u.id}>
+            {u.username} - {u.email}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
