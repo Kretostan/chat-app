@@ -7,6 +7,7 @@ services:
     ports:
       - "3001:3001"
     env_file:
+      - ./.env.development
       - ./backend/.env.development
     environment:
       - CI=true
@@ -14,8 +15,9 @@ services:
     command: pnpm exec nest start --watch
     volumes:
       - ./:/app
-      - /app/node_modules
-      - /app/backend/node_modules
+      - ./data:/app/data
+      - root_node_modules:/app/node_modules
+      - backend_node_modules:/app/backend/node_modules
       - pnpm_global_store:/pnpm-store
     healthcheck:
       test: ["CMD-SHELL", "exit 0"]
@@ -35,11 +37,14 @@ services:
       - PNPM_HOME=/pnpm-store
     volumes:
       - ./:/app/
-      - /app/node_modules
-      - /app/frontend/node_modules
+      - root_node_modules:/app/node_modules
+      - frontend_node_modules:/app/frontend/node_modules
       - pnpm_global_store:/pnpm-store
     depends_on:
       - backend
 
 volumes:
+  root_node_modules:
+  backend_node_modules:
+  frontend_node_modules:
   pnpm_global_store:

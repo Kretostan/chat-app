@@ -6,8 +6,11 @@ services:
       dockerfile: Dockerfile.backend
     environment:
       - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/chat.db
     ports:
       - "3000"
+    volumes:
+      - chat-data:/app/data
     healthcheck:
       test:
         [
@@ -29,3 +32,6 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+
+volumes:
+  chat-data:
