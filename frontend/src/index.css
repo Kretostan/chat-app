@@ -97,7 +97,7 @@
 
 body {
   min-height: 100vh;
-  background: var(--surface-base);
+  background: var(--color-surface-elevated);
   color: var(--foreground-primary);
   font-family: Arial, Helvetica, sans-serif;
 }
