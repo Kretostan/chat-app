@@ -1,3 +1,5 @@
+import { mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 import { Injectable, type OnModuleInit } from "@nestjs/common";
 import Database from "better-sqlite3";
 import {
@@ -14,6 +16,7 @@ export class DatabaseService implements OnModuleInit {
   constructor() {
     const databaseUrl = process.env.DATABASE_URL ?? "file:./data/chat.db";
     const filePath = databaseUrl.replace("file:", "");
+    mkdirSync(dirname(filePath), { recursive: true });
     const sqlite = new Database(filePath);
     sqlite.pragma("journal_mode = WAL");
     sqlite.pragma("foreign_keys = ON");
