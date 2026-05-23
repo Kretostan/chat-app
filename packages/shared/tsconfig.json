@@ -6,18 +6,13 @@
     "rootDir": "src",
     "outDir": "dist",
     "strict": true,
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "target": "ES2023",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "isolatedModules": true
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
