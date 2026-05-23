@@ -1,26 +1,34 @@
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import Socials from "@/components/home/footer/Socials";
 import Footer from "@/components/layout/footer/Footer";
 import Navigation from "@/components/layout/navigation/Navigation";
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/auth')({
-  beforeLoad: ({ location }) => {
+// FIX: Redirect do app na auth jeśli jest zalogowany
+export const Route = createFileRoute("/auth")({
+  beforeLoad: async ({ location }) => {
     if (location.pathname === "/auth") {
       throw redirect({
         to: "/auth/login",
-        replace: true
+        replace: true,
       });
+    }
+
+    const response = await fetch("/api/auth/me");
+    if (response.ok) {
+      throw redirect({ to: "/app" });
     }
   },
   component: AuthLayout,
-})
+});
 
 function AuthLayout() {
-  return <>
-    <Navigation />
-    <Outlet />
-    <Footer>
-      <Socials />
-    </Footer>
-  </>;
+  return (
+    <>
+      <Navigation />
+      <Outlet />
+      <Footer>
+        <Socials />
+      </Footer>
+    </>
+  );
 }

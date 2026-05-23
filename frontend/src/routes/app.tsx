@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import Content from "@/components/app/content/Content";
 import Menu from "@/components/app/menu/Menu";
@@ -7,10 +7,14 @@ import { useMobile } from "@/hooks";
 import type { User } from "@/types";
 
 export const Route = createFileRoute("/app")({
-  loader: async (): Promise<User[]> => {
-    const url = `${import.meta.env.VITE_API_URL}/users`;
-
-    const response = await fetch(url);
+  beforeLoad: async () => {
+    const response = await fetch("/api/auth/me");
+    if (!response.ok) {
+      throw redirect({ to: "/auth/login" });
+    }
+  },
+  loader: async (): Promise<User> => {
+    const response = await fetch("/api/auth/me");
     if (!response.ok) {
       throw new Error(`Response status: ${response.status}`);
     }
@@ -22,8 +26,8 @@ export const Route = createFileRoute("/app")({
 function RouteComponent() {
   const isMobile = useMobile();
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const users = Route.useLoaderData();
-  // const navigate = useNavigate({ from: Route.fullPath });
+  const user = Route.useLoaderData();
+  const navigate = useNavigate({ from: Route.fullPath });
 
   return (
     <div className="flex justify-center items-center h-screen w-screen">
@@ -31,11 +35,18 @@ function RouteComponent() {
         <Navigation>
           <div className="flex gap-4">
             <p>
-              Hello <span className="text-secondary">USERNAME</span>!
+              Hello <span className="text-secondary">{user.username}</span>!
             </p>
             <button
               type="submit"
               className="hover:text-tertiary cursor-pointer"
+              onClick={async () => {
+                await fetch("/api/auth/logout", {
+                  method: "POST",
+                  credentials: "include",
+                });
+                navigate({ to: "/" });
+              }}
             >
               Logout
             </button>
