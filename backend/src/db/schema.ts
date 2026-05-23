@@ -9,6 +9,7 @@ export const users = sqliteTable("users", {
   passwordHash: text("password_hash").notNull(),
   avatarUrl: text("avatar_url"),
   createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
+  tokenVersion: integer("token_version").notNull().default(0),
 });
 
 export const chatRooms = sqliteTable("chat_rooms", {

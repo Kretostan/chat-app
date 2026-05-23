@@ -21,7 +21,8 @@ CREATE TABLE `users` (
 	`email` text NOT NULL,
 	`password_hash` text NOT NULL,
 	`avatar_url` text,
-	`created_at` text DEFAULT (datetime('now')) NOT NULL
+	`created_at` text DEFAULT (datetime('now')) NOT NULL,
+	`token_version` integer DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);--> statement-breakpoint
