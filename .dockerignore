@@ -29,6 +29,11 @@ coverage
 .idea
 .DS_Store
 
+# Workspace package build artifacts (zapobiegają przenoszeniu lokalnych dist/node_modules do obrazu)
+packages/*/dist
+packages/*/node_modules
+packages/*/tsconfig.tsbuildinfo
+
 # temp / cache
 tmp
 temp
