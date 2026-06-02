@@ -2,3 +2,13 @@ packages:
   - "frontend"
   - "backend"
   - "packages/*"
+
+onlyBuiltDependencies:
+  - "@nestjs/core"
+  - "@swc/core"
+  - "better-sqlite3"
+overrides:
+  esbuild@<=0.24.2: '>=0.25.0'
+  file-type@>=13.0.0 <21.3.1: '>=21.3.1'
+  file-type@>=20.0.0 <=21.3.1: '>=21.3.2'
+  qs@>=6.11.1 <=6.15.1: '>=6.15.2'
