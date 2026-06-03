@@ -1,6 +1,6 @@
+import Container from "./Container";
 import Title from "./Title";
 import Wrapper from "./Wrapper";
-import Container from "./Container";
 
 const Navigation = ({ children }: { children?: React.ReactNode }) => {
   return (
@@ -9,7 +9,7 @@ const Navigation = ({ children }: { children?: React.ReactNode }) => {
         <Title />
         {children}
       </Container>
-    </Wrapper >
+    </Wrapper>
   );
 };
 

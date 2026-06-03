@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 import { useMobile } from "@/hooks";
 
 const sections = [

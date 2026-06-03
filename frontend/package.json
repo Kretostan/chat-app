@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "biome:lint": "biome lint .",
-    "biome:format": "biome format .",
+    "biome:format": "biome format . --write",
     "biome:check": "biome check .",
     "preview": "vite preview"
   },
@@ -23,7 +23,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.5",
+    "@biomejs/biome": "2.4.16",
     "@tanstack/router-plugin": "1.167.12",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
