@@ -13,12 +13,23 @@ export const Route = createFileRoute("/app")({
       throw redirect({ to: "/auth/login" });
     }
   },
-  loader: async (): Promise<User> => {
-    const response = await fetch("/api/auth/me");
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
-    }
-    return await response.json();
+  loader: async (): Promise<{ user: User; users: User[] }> => {
+    const [userResponse, usersResponse] = await Promise.all([
+      await fetch("/api/auth/me"),
+      await fetch("/api/users"),
+    ]);
+
+    if (!userResponse.ok)
+      throw new Error(`Response status: ${userResponse.status}`);
+    if (!usersResponse.ok)
+      throw new Error(`Response status: ${usersResponse.status}`);
+
+    const [user, users] = await Promise.all([
+      await userResponse.json(),
+      await usersResponse.json(),
+    ]);
+
+    return { user, users };
   },
   component: RouteComponent,
 });
@@ -26,7 +37,7 @@ export const Route = createFileRoute("/app")({
 function RouteComponent() {
   const isMobile = useMobile();
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const user = Route.useLoaderData();
+  const { user, users } = Route.useLoaderData();
   const navigate = useNavigate({ from: Route.fullPath });
 
   return (
