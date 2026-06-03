@@ -9,7 +9,7 @@ export function useAuth() {
       .then((res) => (res.ok ? res.json() : null))
       .then(setUser)
       .finally(() => setLoading(false));
-  });
+  }, []);
 
   return { user, loading, isAuthenticated: !!user };
 }
