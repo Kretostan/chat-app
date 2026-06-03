@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Footer from "@/components/auth/Footer";
-import Form from "@/components/auth/form/Form";
+import LoginForm from "@/components/auth/form/LoginForm";
 import Header from "@/components/auth/Header";
 import Photo from "@/components/auth/login/Photo";
 
@@ -15,7 +15,7 @@ function RouteComponent() {
       <div className="flex flex-col justify-center items-center gap-3 w-90">
         <div className="flex flex-col justify-center items-center gap-6 px-8 py-10 w-full bg-surface-section border-3 border-border-default rounded-2xl">
           <Header title="Chat App" description="Welcome back!" />
-          <Form from="/auth/login" mode="login" />
+          <LoginForm />
         </div>
         <Footer
           text="Don't have ana account?"
