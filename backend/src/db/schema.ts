@@ -15,9 +15,7 @@ export const users = sqliteTable("users", {
 export const chatRooms = sqliteTable("chat_rooms", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
-  isPrivate: integer("is_private", { mode: "boolean" })
-    .notNull()
-    .default(false),
+  isPrivate: integer("is_private", { mode: "boolean" }).notNull().default(true),
   createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
 });
 
