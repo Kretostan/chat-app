@@ -1,5 +1,10 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const users = sqliteTable("users", {
@@ -19,15 +24,30 @@ export const chatRooms = sqliteTable("chat_rooms", {
   createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
 });
 
+export const chatRoomMembers = sqliteTable(
+  "chat_room_members",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    chatRoomId: integer("chat_room_id")
+      .notNull()
+      .references(() => chatRooms.id, { onDelete: "cascade" }),
+    joinedAt: text("joined_at").notNull().default(sql`(datetime('now'))`),
+  },
+  (table) => [uniqueIndex("custom_name").on(table.userId, table.chatRoomId)],
+);
+
 export const messages = sqliteTable("messages", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   content: text("content").notNull(),
   userId: integer("user_id")
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: "cascade" }),
   chatRoomId: integer("chat_room_id")
     .notNull()
-    .references(() => chatRooms.id),
+    .references(() => chatRooms.id, { onDelete: "cascade" }),
   createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
 });
 
