@@ -1,12 +1,18 @@
 import { motion } from "framer-motion";
+import type { PublicUser } from "shared";
 import Add from "@/assets/add-mark.svg?react";
 import Arrow from "@/assets/arrow-narrow.svg?react";
 import Ellipsis from "@/assets/ellipsis.svg?react";
 import Glass from "@/assets/magnifying-glass.svg?react";
 import { useMobile } from "@/hooks";
-import type { User } from "@/types";
 
-const Menu = ({ users, onSelect }: { users: User[]; onSelect: () => void }) => {
+const Menu = ({
+  users,
+  onSelect,
+}: {
+  users: PublicUser[];
+  onSelect: () => void;
+}) => {
   const isMobile = useMobile();
 
   return (

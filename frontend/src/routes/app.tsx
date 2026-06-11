@@ -1,10 +1,10 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import type { PublicUser } from "shared";
 import Content from "@/components/app/content/Content";
 import Menu from "@/components/app/menu/Menu";
 import Navigation from "@/components/layout/navigation/Navigation";
 import { useMobile } from "@/hooks";
-import type { User } from "@/types";
 
 export const Route = createFileRoute("/app")({
   beforeLoad: async () => {
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/app")({
       throw redirect({ to: "/auth/login" });
     }
   },
-  loader: async (): Promise<{ user: User; users: User[] }> => {
+  loader: async (): Promise<{ user: PublicUser; users: PublicUser[] }> => {
     const [userResponse, usersResponse] = await Promise.all([
       await fetch("/api/auth/me"),
       await fetch("/api/users"),
