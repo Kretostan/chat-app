@@ -11,6 +11,7 @@ async function main() {
   console.log("Seeding database...");
 
   // Clear existing data (reverse FK order)
+  db.delete(schema.chatRoomMembers).run();
   db.delete(schema.messages).run();
   db.delete(schema.chatRooms).run();
   db.delete(schema.users).run();
@@ -21,7 +22,8 @@ async function main() {
     .values({
       username: "alice",
       email: "alice@example.com",
-      passwordHash: "$2b$10$placeholder_hash_alice",
+      passwordHash:
+        "$2b$10$qur/2dobJwUKXoWGnIdlDOymUcEce2rEhcSZSFK1AGQ5DUlwenfmu",
       avatarUrl: null,
     })
     .returning();
@@ -31,7 +33,8 @@ async function main() {
     .values({
       username: "bob",
       email: "bob@example.com",
-      passwordHash: "$2b$10$placeholder_hash_bob",
+      passwordHash:
+        "$2b$10$qur/2dobJwUKXoWGnIdlDOymUcEce2rEhcSZSFK1AGQ5DUlwenfmu",
       avatarUrl: null,
     })
     .returning();
@@ -41,7 +44,8 @@ async function main() {
     .values({
       username: "charlie",
       email: "charlie@example.com",
-      passwordHash: "$2b$10$placeholder_hash_charlie",
+      passwordHash:
+        "$2b$10$qur/2dobJwUKXoWGnIdlDOymUcEce2rEhcSZSFK1AGQ5DUlwenfmu",
       avatarUrl: null,
     })
     .returning();
@@ -58,7 +62,12 @@ async function main() {
     .values({ name: "Random", isPrivate: false })
     .returning();
 
-  console.log("Created rooms:", general.name, random.name);
+  const [secret] = await db
+    .insert(schema.chatRooms)
+    .values({ name: "Secret", isPrivate: true })
+    .returning();
+
+  console.log("Created rooms:", general.name, random.name, secret.name);
 
   const messagesData = [
     { content: "Hey everyone! 👋", userId: alice.id, chatRoomId: general.id },
@@ -103,7 +112,27 @@ async function main() {
       userId: charlie.id,
       chatRoomId: general.id,
     },
+    {
+      content: "Secret project update: v2 ships next week 🤫",
+      userId: alice.id,
+      chatRoomId: secret.id,
+    },
   ];
+
+  db.insert(schema.chatRoomMembers)
+    .values([
+      { userId: alice.id, chatRoomId: general.id },
+      { userId: bob.id, chatRoomId: general.id },
+      { userId: charlie.id, chatRoomId: general.id },
+      { userId: alice.id, chatRoomId: random.id },
+      { userId: bob.id, chatRoomId: random.id },
+      { userId: charlie.id, chatRoomId: random.id },
+      { userId: alice.id, chatRoomId: secret.id },
+      { userId: bob.id, chatRoomId: secret.id },
+    ])
+    .run();
+
+  console.log("Created chat room members");
 
   for (const msg of messagesData) {
     await db.insert(schema.messages).values(msg);
