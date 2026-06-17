@@ -8,7 +8,9 @@ export const sessions = sqliteTable("sessions", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  tokenVersion: integer("token_version").notNull().default(0),
+  isCurrent: integer("is_current", { mode: "boolean" })
+    .notNull()
+    .default(false),
   deviceName: text("device_name"),
   createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   lastUsedAt: text("last_used_at").notNull(),

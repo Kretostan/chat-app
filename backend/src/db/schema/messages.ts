@@ -21,7 +21,7 @@ export const messages = sqliteTable(
       .notNull()
       .references(() => chatRooms.id, { onDelete: "cascade" }),
     createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
-    clientMessageId: text(),
+    clientMessageId: text("client_message_id"),
   },
   (table) => [
     uniqueIndex("uq_client_message_id").on(table.userId, table.clientMessageId),
