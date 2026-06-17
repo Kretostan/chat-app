@@ -48,8 +48,9 @@ so I can have a face-to-face conversation and see the other person's reactions.
 
 ### Security
 
-- Authentication: JWT (AccessToken + RefreshToken stored in HttpOnly Cookies)
+- Authentication: JWT (AccessToken stored in HttpOnly Cookie)
 to ensure secure sessions without frequent re-logging.
+  - Refresh token: backlog (post-v0.1) — see `docs/todo.md` Backlog.
 - Authorization: Resource-level access control (Middleware)
 to verify if the `user_id` from the token is authorized to access a specific `chat_id`.
 - Rate Limiting:

@@ -12,7 +12,7 @@
 - `password_hash`: text
 - `avatar_url`: text (nullable)
 - `created_at`: text (ISO 8601, default: now)
-- `token_version`: ~~integer (default: 0, incremented on logout)~~ *(removed — per-device session management via `sessions` table)*
+- ~~`token_version`: integer (default: 0, incremented on logout)~~ *(removed from Drizzle schema — pending migration drop; per-device session management via `sessions` table)*
 
 ### chat_rooms
 
@@ -61,7 +61,7 @@
 
 - `id`: integer (PK, autoincrement)
 - `user_id`: integer (FK → users.id, ON DELETE CASCADE)
-- `token_version`: integer (default: 0, incremented on device logout)
+- `is_current`: integer (boolean, default: false, true for the active device session)
 - `device_name`: text (nullable, e.g. user-agent for display)
 - `created_at`: text (ISO 8601, default: now)
 - `last_used_at`: text (ISO 8601, default: now, updated on each request)

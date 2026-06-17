@@ -20,7 +20,7 @@
 
 ### Users
 
-- `GET /users/me` – Retrieve the current user's profile.
+- `GET /users/profile` – Retrieve the current user's profile.
 - `GET /users/search?q=...` – Find users to start a new conversation.
 
 ### Chat rooms

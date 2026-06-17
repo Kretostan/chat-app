@@ -22,7 +22,7 @@ to rooms named after the `chatRoomId`.
 
 | Event | Payload | Description |
 |-------|---------|-------------|
-| `room:create` | `{ memberId }` | Create a DM conversation |
+| `room:create` | `{ userIds: number[] }` | Create a conversation (DM or group) |
 | `room:join` | `{ roomId }` | Join a room (subscribe to events) |
 | `message:send` | `{ roomId, content, clientMessageId }` | Send a message |
 
