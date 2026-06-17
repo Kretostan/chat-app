@@ -70,6 +70,6 @@ when new ones arrive during scrolling.
 - Logging:
   - Log: 500 errors, unauthorized access attempts, key endpoint response times.
   - Do NOT log: Passwords, message content (PII), or raw JWT tokens.
-- DB Migrations: Prisma Migrate for rapid prototyping and schema consistency.
+- DB Migrations: Drizzle Migrate for rapid prototyping and schema consistency.
 - Monitoring: Health-check endpoint (/health), basic logs (CloudWatch/Loki),
 and uptime monitoring (e.g., UptimeRobot).

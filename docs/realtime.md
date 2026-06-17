@@ -3,7 +3,6 @@
 ## Transport
 
 - **Library:** Socket.io (NestJS Gateway).
-- **URL:** `wss://api.chatapp.com/`
 - **Auth:** JWT extracted from `Cookie` during the handshake.
 
 ## Rules
@@ -12,29 +11,38 @@
 - **ACK (Acknowledgment):** **YES**. The client waits for a server callback
 after sending a message. If a timeout occurs (5s),
 the UI displays a "failed to send" state.
-- **Idempotency:** `client_message_id` is **required**. The server ignores messages
+- **Idempotency:** `clientMessageId` is **required**. The server ignores messages
 with duplicate IDs from the same sender.
 - **Room Logic:** Upon connection, the server automatically joins the socket
-to "Rooms" named after the `conversation_id`.
+to rooms named after the `chatRoomId`.
 
 ## Events (MVP)
 
 ### Client → Server
 
-- `subscribe`: `(conversation_id)` – Join a specific chat room.
-- `send_message`: `{ conversation_id, body, client_message_id }`.
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `room:create` | `{ memberId }` | Create a DM conversation |
+| `room:join` | `{ roomId }` | Join a room (subscribe to events) |
+| `message:send` | `{ roomId, content, clientMessageId }` | Send a message |
 
 ### Server → Client
 
-- `new_message`: `{ id, conversation_id, sender_id, body, created_at,
-client_message_id }`.
-- `exception`: `{ status: "error", message: string }` – For validation or
-permission errors.
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `room:created` | `{ id, name, type, isPrivate, createdAt }` | Confirmation with new room data |
+| `message:new` | `{ id, userId, chatRoomId, content, createdAt, clientMessageId }` | Broadcast new message to room |
+| `exception` | `{ status: "error", message: string }` | Validation or permission error |
 
 ## v0.2 Signaling (Multimedia)
 
-- `call_initiate`: `{ conversation_id, type: 'audio' | 'video' }`.
-- `call_offer / call_answer`: Signaling data for WebRTC peer-to-peer connection.
+| Event | Direction | Payload |
+|-------|-----------|---------|
+| `call:initiate` | client → server | `{ roomId, type: 'audio' \| 'video' }` |
+| `call:offer` | client → server | `{ roomId, sdp }` |
+| `call:answer` | client → server | `{ roomId, sdp }` |
+| `call:ice-candidate` | client → server | `{ roomId, candidate }` |
+| `call:end` | client → server | End the call |
 
 ## Event Backlog
 
