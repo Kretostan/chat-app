@@ -1,0 +1,10 @@
+import { z } from "zod";
+
+export const sessionSchema = z.object({
+  id: z.number(),
+  userId: z.number(),
+  deviceName: z.string(),
+  createdAt: z.iso.datetime(),
+  lastUsedAt: z.iso.datetime(),
+  isCurrent: z.boolean().default(false),
+});
