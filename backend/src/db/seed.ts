@@ -54,12 +54,12 @@ async function main() {
 
   const [general] = await db
     .insert(schema.chatRooms)
-    .values({ name: "General", isPrivate: false })
+    .values({ name: "General", isPrivate: false, type: "group" })
     .returning();
 
   const [random] = await db
     .insert(schema.chatRooms)
-    .values({ name: "Random", isPrivate: false })
+    .values({ name: "Random", isPrivate: false, type: "group" })
     .returning();
 
   const [secret] = await db
