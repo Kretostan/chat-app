@@ -1,9 +1,9 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { Strategy } from "passport-jwt";
 import { DatabaseService } from "../db/database.service";
-import { users } from "../db/schema";
+import { sessions, users } from "../db/schema";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -18,22 +18,34 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: {
     sub: number;
     username: string;
-    tokenVersion: number;
+    sessionId: number;
   }) {
     const [user] = await this.databaseService.db
       .select()
       .from(users)
-      .where(eq(users.username, payload.username))
-      .limit(1);
+      .where(
+        and(eq(users.username, payload.username), eq(users.id, payload.sub)),
+      );
 
-    if (!user || user.tokenVersion !== payload.tokenVersion)
-      throw new UnauthorizedException();
+    if (!user) throw new UnauthorizedException();
+
+    const [session] = await this.databaseService.db
+      .select()
+      .from(sessions)
+      .where(
+        and(
+          eq(sessions.userId, payload.sub),
+          eq(sessions.id, payload.sessionId),
+        ),
+      );
+
+    if (!session?.isCurrent) throw new UnauthorizedException();
 
     return {
       id: user.id,
       username: user.username,
       email: user.email,
-      tokenVersion: user.tokenVersion,
+      sessionId: session.id,
     };
   }
 }

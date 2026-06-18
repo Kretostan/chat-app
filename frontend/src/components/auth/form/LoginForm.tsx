@@ -21,7 +21,10 @@ const LoginForm = () => {
     const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values as LoginValues),
+      body: JSON.stringify({
+        ...values,
+        deviceName: `${navigator.userAgentData.brands[0].brand}, ${navigator.userAgentData.platform}`,
+      }),
     });
 
     if (!response.ok) {

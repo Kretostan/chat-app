@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Res, UseGuards } from "@nestjs/common";
 import { type Response } from "express";
 import {
+  type AuthUser,
   type LoginValues,
   loginSchema,
   type RegisterValues,
@@ -24,10 +25,16 @@ export class AuthController {
 
   @Post("/login")
   async login(
-    @Body(new ZodValidationPipe(loginSchema)) dto: LoginValues,
+    @Body(new ZodValidationPipe(loginSchema)) dto: LoginValues & {
+      deviceName: string;
+    },
     @Res({ passthrough: true }) response: Response,
   ) {
-    const token = await this.authService.login(dto.login, dto.password);
+    const token = await this.authService.login(
+      dto.login,
+      dto.password,
+      dto.deviceName,
+    );
 
     response.cookie("access_token", token, {
       httpOnly: true,
@@ -43,7 +50,7 @@ export class AuthController {
   @Post("/logout")
   @UseGuards(JwtAuthGuard)
   async logout(
-    @CurrentUser() user,
+    @CurrentUser() user: AuthUser,
     @Res({ passthrough: true }) response: Response,
   ) {
     await this.authService.logout(user);
@@ -55,7 +62,7 @@ export class AuthController {
 
   @Get("/me")
   @UseGuards(JwtAuthGuard)
-  async me(@CurrentUser() user) {
+  async me(@CurrentUser() user: AuthUser) {
     return user;
   }
 }

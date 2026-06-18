@@ -8,4 +8,11 @@ export const publicUserSchema = z.object({
   createdAt: z.string(),
 });
 
+export interface AuthUser {
+  id: number;
+  username: string;
+  email: string;
+  sessionId: number;
+}
+
 export type PublicUser = z.infer<typeof publicUserSchema>;

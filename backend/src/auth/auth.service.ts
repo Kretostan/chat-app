@@ -1,10 +1,10 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import bcrypt from "bcrypt";
-import { eq, or } from "drizzle-orm";
-import type { RegisterValues } from "shared";
+import { and, eq, or, sql } from "drizzle-orm";
+import type { AuthUser, RegisterValues } from "shared";
 import { DatabaseService } from "../db/database.service";
-import { users } from "../db/schema";
+import { sessions, users } from "../db/schema";
 
 @Injectable()
 export class AuthService {
@@ -39,34 +39,71 @@ export class AuthService {
     return result;
   }
 
-  async login(login: string, password: string): Promise<string> {
-    const user = await this.databaseService.db
+  async login(
+    login: string,
+    password: string,
+    deviceName: string,
+  ): Promise<string> {
+    const [user] = await this.databaseService.db
       .select()
       .from(users)
       .where(or(eq(users.email, login), eq(users.username, login)))
       .limit(1);
 
-    if (!user.length) {
+    if (!user) {
       throw new ConflictException("Invalid credentials");
     }
 
-    const isValid = await bcrypt.compare(password, user[0].passwordHash);
+    const isValid = await bcrypt.compare(password, user.passwordHash);
     if (!isValid) {
       throw new ConflictException("Invalid credentials");
     }
 
+    const [session] = await this.databaseService.db
+      .select()
+      .from(sessions)
+      .where(
+        and(eq(sessions.deviceName, deviceName), eq(sessions.userId, user.id)),
+      );
+
     const payload = {
-      sub: user[0].id,
-      username: user[0].username,
-      tokenVersion: user[0].tokenVersion,
+      sub: user.id,
+      username: user.username,
     };
-    return this.jwtService.sign(payload);
+
+    if (!session) {
+      const [newSession] = await this.databaseService.db
+        .insert(sessions)
+        .values({
+          userId: user.id,
+          deviceName,
+          isCurrent: true,
+          lastUsedAt: sql`datetime("now")`,
+        })
+        .returning();
+
+      return this.jwtService.sign({ ...payload, sessionId: newSession.id });
+    }
+
+    await this.databaseService.db
+      .update(sessions)
+      .set({
+        isCurrent: true,
+        lastUsedAt: sql`datetime("now")`,
+      })
+      .where(
+        and(eq(sessions.deviceName, deviceName), eq(sessions.userId, user.id)),
+      );
+
+    return this.jwtService.sign({ ...payload, sessionId: session.id });
   }
 
-  async logout(user) {
+  async logout(user: AuthUser) {
     await this.databaseService.db
-      .update(users)
-      .set({ tokenVersion: user.token_version + 1 })
-      .where(eq(users.id, user.id));
+      .update(sessions)
+      .set({ isCurrent: false, lastUsedAt: sql`datetime("now")` })
+      .where(
+        and(eq(sessions.userId, user.id), eq(sessions.id, user.sessionId)),
+      );
   }
 }
