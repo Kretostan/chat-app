@@ -52,10 +52,13 @@ function RouteComponent() {
               type="submit"
               className="hover:text-tertiary cursor-pointer"
               onClick={async () => {
-                await fetch("/api/auth/logout", {
+                const response = await fetch("/api/auth/logout", {
                   method: "POST",
                   credentials: "include",
                 });
+                if (!response.ok) {
+                  throw new Error("Nie udało się wylogować");
+                }
                 navigate({ to: "/" });
               }}
             >

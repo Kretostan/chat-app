@@ -8,22 +8,34 @@ import Input from "./Input";
 
 const LoginForm = () => {
   const [error, setError] = useState<string>("");
+  const [sessionUuid] = useState(() => {
+    const existing = localStorage.getItem("sessionUuid");
+    if (existing) return existing;
+    const uuid = crypto.randomUUID();
+    localStorage.setItem("sessionUuid", uuid);
+    return uuid;
+  });
   const navigate = useNavigate({ from: "/auth/login" });
 
-  const initialValues: LoginValues = { login: "", password: "" };
-
-  const { values, handleChange } = useAuthForm(initialValues);
+  const { values, handleChange } = useAuthForm({
+    login: "",
+    password: "",
+  } as LoginValues);
   const isValid = loginSchema.safeParse(values).success;
 
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const deviceName = navigator?.userAgentData
+      ? `${navigator.userAgentData.brands[0].brand}, ${navigator.userAgentData.platform}`
+      : navigator.userAgent;
     const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...values,
-        deviceName: `${navigator.userAgentData.brands[0].brand}, ${navigator.userAgentData.platform}`,
+        deviceName: deviceName,
+        sessionUuid: sessionUuid,
       }),
     });
 
