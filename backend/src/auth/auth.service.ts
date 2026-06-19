@@ -2,7 +2,7 @@ import { ConflictException, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import bcrypt from "bcrypt";
 import { and, eq, or, sql } from "drizzle-orm";
-import type { AuthUser, RegisterValues } from "shared";
+import type { RegisterValues } from "shared";
 import { DatabaseService } from "../db/database.service";
 import { sessions, users } from "../db/schema";
 
@@ -43,6 +43,7 @@ export class AuthService {
     login: string,
     password: string,
     deviceName: string,
+    sessionUuid: string,
   ): Promise<string> {
     const [user] = await this.databaseService.db
       .select()
@@ -59,51 +60,46 @@ export class AuthService {
       throw new ConflictException("Invalid credentials");
     }
 
-    const [session] = await this.databaseService.db
-      .select()
-      .from(sessions)
-      .where(
-        and(eq(sessions.deviceName, deviceName), eq(sessions.userId, user.id)),
-      );
-
     const payload = {
       sub: user.id,
       username: user.username,
     };
 
-    if (!session) {
+    const [existingSession] = await this.databaseService.db
+      .select()
+      .from(sessions)
+      .where(
+        and(
+          eq(sessions.sessionUuid, sessionUuid),
+          eq(sessions.userId, user.id),
+        ),
+      );
+
+    if (!existingSession) {
       const [newSession] = await this.databaseService.db
         .insert(sessions)
         .values({
           userId: user.id,
           deviceName,
-          isCurrent: true,
-          lastUsedAt: sql`datetime("now")`,
+          lastUsedAt: sql`datetime('now')`,
+          sessionUuid,
         })
         .returning();
+
+      // INFO: GDZIE? \/
+      // FIX: Usuwać sesje starsze niż 7 dni (chyba, że zmienię token na 30 to 30)
 
       return this.jwtService.sign({ ...payload, sessionId: newSession.id });
     }
 
     await this.databaseService.db
       .update(sessions)
-      .set({
-        isCurrent: true,
-        lastUsedAt: sql`datetime("now")`,
-      })
-      .where(
-        and(eq(sessions.deviceName, deviceName), eq(sessions.userId, user.id)),
-      );
+      .set({ lastUsedAt: sql`datetime('now')` })
+      .where(eq(sessions.id, existingSession.id));
 
-    return this.jwtService.sign({ ...payload, sessionId: session.id });
-  }
-
-  async logout(user: AuthUser) {
-    await this.databaseService.db
-      .update(sessions)
-      .set({ isCurrent: false, lastUsedAt: sql`datetime("now")` })
-      .where(
-        and(eq(sessions.userId, user.id), eq(sessions.id, user.sessionId)),
-      );
+    return this.jwtService.sign({
+      ...payload,
+      sessionId: existingSession.id,
+    });
   }
 }

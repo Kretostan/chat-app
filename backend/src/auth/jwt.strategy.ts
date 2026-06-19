@@ -39,7 +39,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         ),
       );
 
-    if (!session?.isCurrent) throw new UnauthorizedException();
+    if (!session) throw new UnauthorizedException();
 
     return {
       id: user.id,
