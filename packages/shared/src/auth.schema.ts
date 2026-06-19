@@ -15,6 +15,8 @@ export const registerSchema = z
 export const loginSchema = z.object({
   login: z.string().min(3, "Login is required").max(30),
   password: z.string().min(8, "Password minimum 8 characters").max(128),
+  deviceName: z.string().optional(),
+  sessionUuid: z.string(),
 });
 
 export type RegisterValues = z.infer<typeof registerSchema>;

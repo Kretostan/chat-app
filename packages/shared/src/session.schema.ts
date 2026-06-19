@@ -6,5 +6,5 @@ export const sessionSchema = z.object({
   deviceName: z.string(),
   createdAt: z.iso.datetime(),
   lastUsedAt: z.iso.datetime(),
-  isCurrent: z.boolean().default(false),
+  sessionUuid: z.string().nullable(),
 });
