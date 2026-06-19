@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "b95a60f5-a805-4a16-be12-7d8603f7efd2",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "d855c86f-44fb-4d52-a2a9-ff3fa0f69b1f",
+  "prevId": "b95a60f5-a805-4a16-be12-7d8603f7efd2",
   "tables": {
     "chat_room_members": {
       "name": "chat_room_members",
@@ -261,9 +261,24 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "sessionUuid": {
+          "name": "sessionUuid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "sessions_sessionUuid_unique": {
+          "name": "sessions_sessionUuid_unique",
+          "columns": [
+            "sessionUuid"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "sessions_user_id_users_id_fk": {
           "name": "sessions_user_id_users_id_fk",

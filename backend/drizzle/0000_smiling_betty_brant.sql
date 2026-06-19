@@ -14,7 +14,7 @@ CREATE TABLE `chat_rooms` (
 	`type` text DEFAULT 'dm' NOT NULL,
 	`is_private` integer DEFAULT true NOT NULL,
 	`created_at` text DEFAULT (datetime('now')) NOT NULL,
-	`lastMessageAt` text
+	`last_message_at` text
 );
 --> statement-breakpoint
 CREATE TABLE `messages` (
@@ -23,16 +23,15 @@ CREATE TABLE `messages` (
 	`user_id` integer NOT NULL,
 	`chat_room_id` integer NOT NULL,
 	`created_at` text DEFAULT (datetime('now')) NOT NULL,
-	`clientMessageId` text,
+	`client_message_id` text,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`chat_room_id`) REFERENCES `chat_rooms`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `uq_client_message_id` ON `messages` (`user_id`,`clientMessageId`);--> statement-breakpoint
+CREATE UNIQUE INDEX `uq_client_message_id` ON `messages` (`user_id`,`client_message_id`);--> statement-breakpoint
 CREATE TABLE `sessions` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`user_id` integer NOT NULL,
-	`is_current` integer DEFAULT false NOT NULL,
 	`device_name` text,
 	`created_at` text DEFAULT (datetime('now')) NOT NULL,
 	`last_used_at` text NOT NULL,
