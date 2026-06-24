@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { ChatRoomDetails } from "shared";
 import { DatabaseService } from "src/db/database.service";
@@ -80,7 +80,7 @@ export class ChatService {
       },
     });
 
-    if (!room) throw new ForbiddenException();
+    if (!room) throw new NotFoundException();
 
     return {
       ...room,
