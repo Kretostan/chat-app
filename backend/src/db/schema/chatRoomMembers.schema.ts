@@ -6,8 +6,8 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { chatRooms } from "./chatRooms";
-import { users } from "./users";
+import { chatRooms } from "./chatRooms.schema";
+import { users } from "./users.schema";
 
 export const chatRoomMembers = sqliteTable(
   "chat_room_members",

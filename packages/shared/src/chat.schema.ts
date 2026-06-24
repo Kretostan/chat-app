@@ -42,3 +42,26 @@ export const createMessageSchema = z.object({
   roomId: z.number(),
   clientMessageId: z.string(),
 });
+
+export const roomMemberInfoSchema = z.object({
+  id: z.number(),
+  username: z.string(),
+  avatarUrl: z.string().nullable(),
+  joinedAt: z.iso.datetime(),
+});
+
+export const lastMessageInfoSchema = z.object({
+  id: z.number(),
+  content: z.string().min(1).max(4000),
+  userId: z.number(),
+  createdAt: z.iso.datetime(),
+  clientMessageId: z.string().nullable(),
+});
+
+export const chatRoomDetailsSchema = chatRoomSchema.extend({
+  members: z.array(roomMemberInfoSchema),
+  lastMessage: lastMessageInfoSchema.nullable(),
+});
+
+export type RoomMemberInfo = z.infer<typeof roomMemberInfoSchema>;
+export type ChatRoomDetails = z.infer<typeof chatRoomDetailsSchema>;

@@ -12,14 +12,18 @@ export const registerSchema = z
     path: ["confirmPassword"],
   });
 
-export const loginSchema = z.object({
+export const loginFormSchema = z.object({
   login: z.string().min(3, "Login is required").max(30),
   password: z.string().min(8, "Password minimum 8 characters").max(128),
-  deviceName: z.string().optional(),
+});
+
+export const loginSchema = loginFormSchema.extend({
+  deviceName: z.string(),
   sessionUuid: z.string(),
 });
 
 export type RegisterValues = z.infer<typeof registerSchema>;
+export type LoginFormValues = z.infer<typeof loginFormSchema>;
 export type LoginValues = z.infer<typeof loginSchema>;
 
-export type AuthValues = RegisterValues | LoginValues;
+export type AuthValues = RegisterValues | LoginFormValues;
