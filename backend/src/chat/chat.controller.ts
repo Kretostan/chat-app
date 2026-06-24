@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, UseGuards } from "@nestjs/common";
 import type { AuthUser } from "shared";
 import { CurrentUser } from "src/auth/decorators/current-user.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
@@ -12,5 +12,14 @@ export class ChatController {
   @UseGuards(JwtAuthGuard)
   async loadRooms(@CurrentUser() user: AuthUser) {
     return await this.chatService.loadRooms(user.id);
+  }
+
+  @Get("/rooms/:id/messages")
+  @UseGuards(JwtAuthGuard)
+  async loadMessages(
+    @CurrentUser() user: AuthUser,
+    @Param("id") roomId: string,
+  ) {
+    return await this.chatService.loadRoom(+roomId, user.id);
   }
 }
