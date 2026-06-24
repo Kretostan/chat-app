@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Strategy } from "passport-jwt";
 import { DatabaseService } from "../db/database.service";
 import { sessions, users } from "../db/schema";

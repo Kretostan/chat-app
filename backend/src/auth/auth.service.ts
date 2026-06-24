@@ -1,8 +1,12 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import bcrypt from "bcrypt";
 import { and, eq, or, sql } from "drizzle-orm";
-import type { RegisterValues } from "shared";
+import type { AuthUser, RegisterValues } from "shared";
 import { DatabaseService } from "../db/database.service";
 import { sessions, users } from "../db/schema";
 
@@ -87,7 +91,7 @@ export class AuthService {
         .returning();
 
       // INFO: GDZIE? \/
-      // FIX: Usuwać sesje starsze niż 7 dni (chyba, że zmienię token na 30 to 30)
+      // FIX: Sesje, które wysłał frontend, a nie ma ich na backendzie
 
       return this.jwtService.sign({ ...payload, sessionId: newSession.id });
     }
@@ -101,5 +105,23 @@ export class AuthService {
       ...payload,
       sessionId: existingSession.id,
     });
+  }
+
+  async sessions(user: AuthUser) {
+    return await this.databaseService.db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.userId, user.id));
+  }
+
+  async removeSession(params: string, sessionId: number) {
+    const id = parseInt(params, 10);
+    if (id === sessionId) {
+      throw new BadRequestException("Cannot delete current session");
+    }
+
+    return await this.databaseService.db
+      .delete(sessions)
+      .where(eq(sessions.id, id));
   }
 }

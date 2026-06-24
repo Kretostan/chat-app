@@ -2,8 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
-  Req,
   Res,
   UseGuards,
 } from "@nestjs/common";
@@ -57,13 +57,27 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async logout(@Res({ passthrough: true }) response: Response) {
     response.clearCookie("access_token", { path: "/" });
-    response.status(204).end();
     return;
   }
 
-  @Get("/me")
+  @Get("/profile")
   @UseGuards(JwtAuthGuard)
   async me(@CurrentUser() user: AuthUser) {
     return user;
+  }
+
+  @Get("/sessions")
+  @UseGuards(JwtAuthGuard)
+  async sessions(@CurrentUser() user: AuthUser) {
+    return this.authService.sessions(user);
+  }
+
+  @Post("/sessions/:id/logout")
+  @UseGuards(JwtAuthGuard)
+  async removeSession(
+    @Param("id") params: string,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.authService.removeSession(params, user.sessionId);
   }
 }
