@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { type SubmitEvent, useState } from "react";
-import { type LoginValues, loginSchema } from "shared";
+import { type LoginFormValues, loginFormSchema } from "shared";
 import { useAuthForm } from "@/hooks";
 import Alert from "../Alert";
 import Button from "./Button";
@@ -8,20 +8,13 @@ import Input from "./Input";
 
 const LoginForm = () => {
   const [error, setError] = useState<string>("");
-  const [sessionUuid] = useState(() => {
-    const existing = localStorage.getItem("sessionUuid");
-    if (existing) return existing;
-    const uuid = crypto.randomUUID();
-    localStorage.setItem("sessionUuid", uuid);
-    return uuid;
-  });
   const navigate = useNavigate({ from: "/auth/login" });
 
   const { values, handleChange } = useAuthForm({
     login: "",
     password: "",
-  } as LoginValues);
-  const isValid = loginSchema.safeParse(values).success;
+  });
+  const isValid = loginFormSchema.safeParse(values as LoginFormValues).success;
 
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -29,6 +22,19 @@ const LoginForm = () => {
     const deviceName = navigator?.userAgentData
       ? `${navigator.userAgentData.brands[0].brand}, ${navigator.userAgentData.platform}`
       : navigator.userAgent;
+
+    const stored = localStorage.getItem("sessionUuids");
+    const sessionUuids: Record<string, string> = stored
+      ? JSON.parse(stored)
+      : {};
+
+    const loginKey = (values as LoginFormValues).login;
+    let sessionUuid = sessionUuids[loginKey];
+    if (!sessionUuid) {
+      sessionUuid = crypto.randomUUID();
+      sessionUuids[loginKey] = sessionUuid;
+    }
+
     const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -44,6 +50,7 @@ const LoginForm = () => {
       return setError(data.message);
     }
 
+    localStorage.setItem("sessionUuids", JSON.stringify(sessionUuids));
     navigate({ to: "/app" });
   };
 

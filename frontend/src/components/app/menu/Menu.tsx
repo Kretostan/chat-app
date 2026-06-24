@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import type { PublicUser } from "shared";
+import type { ChatRoomDetails, RoomMemberInfo } from "shared";
 import Add from "@/assets/add-mark.svg?react";
 import Arrow from "@/assets/arrow-narrow.svg?react";
 import Ellipsis from "@/assets/ellipsis.svg?react";
@@ -7,10 +7,12 @@ import Glass from "@/assets/magnifying-glass.svg?react";
 import { useMobile } from "@/hooks";
 
 const Menu = ({
-  users,
+  currentUserId,
+  rooms,
   onSelect,
 }: {
-  users: PublicUser[];
+  currentUserId: number;
+  rooms: ChatRoomDetails[];
   onSelect: () => void;
 }) => {
   const isMobile = useMobile();
@@ -73,27 +75,44 @@ const Menu = ({
       </div>
       {/* USERS LIST */}
       <ul className="flex flex-col gap-2 h-full">
-        {users.map((user) => (
-          <motion.li
-            key={user.id}
-            className="flex gap-3 py-3 px-4 hover:bg-primary/20 border-r-2 border-transparent hover:border-primary cursor-pointer"
-          >
-            <div className="flex justify-center items-center h-11 w-11 bg-secondary rounded-full shrink-0">
-              {user.username.charAt(0).toLocaleUpperCase()}
-            </div>
-            <div className="flex justify-between items-center w-full">
-              <div>
-                <p>{user.username}</p>
-                <p className="text-xs">
-                  !!! WIADOMOŚĆ UŻYTKOWNIKA id. {user.id} !!!
-                </p>
-              </div>
-              <div
-                className={`h-2 w-2 mr-1 ${user.username === "bob" ? "bg-error" : "bg-success"} rounded-full`}
-              ></div>
-            </div>
-          </motion.li>
-        ))}
+        {rooms.length ? (
+          rooms.map((room) => {
+            const otherMember =
+              room.type === "dm"
+                ? (room.members.find(
+                    (member) => member.id !== currentUserId,
+                  ) as RoomMemberInfo)
+                : null;
+            return (
+              <motion.li
+                key={room.id}
+                className="flex gap-3 py-3 px-4 hover:bg-primary/20 border-r-2 border-transparent hover:border-primary cursor-pointer"
+              >
+                <div className="flex justify-center items-center h-11 w-11 bg-secondary rounded-full shrink-0">
+                  {room.type === "dm"
+                    ? otherMember?.username.charAt(0).toLocaleUpperCase()
+                    : room.name?.charAt(0).toLocaleUpperCase()}
+                </div>
+                <div className="flex justify-between items-center w-full">
+                  <div>
+                    <p>
+                      {room.type === "dm" ? otherMember?.username : room.name}
+                    </p>
+                    <p className="text-xs">
+                      {/* !!! WIADOMOŚĆ UŻYTKOWNIKA id. {user.id} !!! */}
+                      {room.lastMessage?.content ?? "No messages yet"}
+                    </p>
+                  </div>
+                  <div
+                    className={`h-2 w-2 mr-1 ${otherMember?.username === "bob" ? "bg-error" : "bg-success"} rounded-full`}
+                  ></div>
+                </div>
+              </motion.li>
+            );
+          })
+        ) : (
+          <p>"No chat rooms yet"</p>
+        )}
       </ul>
     </div>
   );

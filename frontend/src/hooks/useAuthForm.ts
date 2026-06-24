@@ -1,7 +1,7 @@
 import { type ChangeEvent, useState } from "react";
-import type { LoginValues, RegisterValues } from "shared";
+import type { AuthValues } from "shared";
 
-export const useAuthForm = (initialValues: RegisterValues | LoginValues) => {
+export const useAuthForm = (initialValues: AuthValues) => {
   const [values, setValues] = useState(initialValues);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {

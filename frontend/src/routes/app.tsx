@@ -1,6 +1,6 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import type { PublicUser } from "shared";
+import type { ChatRoomDetails, PublicUser } from "shared";
 import Content from "@/components/app/content/Content";
 import Menu from "@/components/app/menu/Menu";
 import Navigation from "@/components/layout/navigation/Navigation";
@@ -8,28 +8,31 @@ import { useMobile } from "@/hooks";
 
 export const Route = createFileRoute("/app")({
   beforeLoad: async () => {
-    const response = await fetch("/api/auth/me");
+    const response = await fetch("/api/auth/profile");
     if (!response.ok) {
       throw redirect({ to: "/auth/login" });
     }
   },
-  loader: async (): Promise<{ user: PublicUser; users: PublicUser[] }> => {
-    const [userResponse, usersResponse] = await Promise.all([
-      await fetch("/api/auth/me"),
-      await fetch("/api/users"),
+  loader: async (): Promise<{
+    user: PublicUser;
+    rooms: ChatRoomDetails[] | [];
+  }> => {
+    const [userResponse, roomsReponse] = await Promise.all([
+      await fetch("/api/auth/profile"),
+      await fetch("/api/chat/rooms"),
     ]);
 
     if (!userResponse.ok)
       throw new Error(`Response status: ${userResponse.status}`);
-    if (!usersResponse.ok)
-      throw new Error(`Response status: ${usersResponse.status}`);
+    if (!roomsReponse.ok)
+      throw new Error(`Response status: ${roomsReponse.status}`);
 
-    const [user, users] = await Promise.all([
+    const [user, rooms] = await Promise.all([
       await userResponse.json(),
-      await usersResponse.json(),
+      await roomsReponse.json(),
     ]);
 
-    return { user, users };
+    return { user, rooms };
   },
   component: RouteComponent,
 });
@@ -37,7 +40,7 @@ export const Route = createFileRoute("/app")({
 function RouteComponent() {
   const isMobile = useMobile();
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const { user, users } = Route.useLoaderData();
+  const { user, rooms } = Route.useLoaderData();
   const navigate = useNavigate({ from: Route.fullPath });
 
   return (
@@ -69,7 +72,11 @@ function RouteComponent() {
       )}
       <div className="flex lg:mt-22 max-h-200 h-full 2xl:max-w-400 w-full md:border-4 md:border-border-default md:rounded-xl md:overflow-hidden">
         {showMenu && (
-          <Menu users={users} onSelect={() => setShowMenu((prev) => !prev)} />
+          <Menu
+            currentUserId={user.id}
+            rooms={rooms}
+            onSelect={() => setShowMenu((prev) => !prev)}
+          />
         )}
         {(!isMobile || !showMenu) && (
           <Content onBack={() => setShowMenu((prev) => !prev)} />
