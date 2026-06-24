@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import type { ChatRoomDetails, RoomMemberInfo } from "shared";
 import Add from "@/assets/add-mark.svg?react";
@@ -16,6 +17,11 @@ const Menu = ({
   onSelect: () => void;
 }) => {
   const isMobile = useMobile();
+  const navigate = useNavigate({ from: "/app" });
+
+  const openRoom = async (id: number) => {
+    navigate({ to: `/app/room/${id}` });
+  };
 
   return (
     <div className="flex flex-col gap-2.5 h-screen md:h-full w-screen lg:max-w-85 lg:w-full bg-surface-section">
@@ -85,8 +91,10 @@ const Menu = ({
                 : null;
             return (
               <motion.li
+                id={room.id.toString()}
                 key={room.id}
                 className="flex gap-3 py-3 px-4 hover:bg-primary/20 border-r-2 border-transparent hover:border-primary cursor-pointer"
+                onClick={() => openRoom(room.id)}
               >
                 <div className="flex justify-center items-center h-11 w-11 bg-secondary rounded-full shrink-0">
                   {room.type === "dm"

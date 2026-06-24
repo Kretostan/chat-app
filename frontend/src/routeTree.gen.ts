@@ -15,8 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthResetRouteImport } from './routes/auth/reset'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as AppGroupGroupIdRouteImport } from './routes/app/group.$groupId'
-import { Route as AppChatChatIdRouteImport } from './routes/app/chat.$chatId'
+import { Route as AppRoomRoomIdRouteImport } from './routes/app/room.$roomId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -48,14 +47,9 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
-const AppGroupGroupIdRoute = AppGroupGroupIdRouteImport.update({
-  id: '/group/$groupId',
-  path: '/group/$groupId',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppChatChatIdRoute = AppChatChatIdRouteImport.update({
-  id: '/chat/$chatId',
-  path: '/chat/$chatId',
+const AppRoomRoomIdRoute = AppRoomRoomIdRouteImport.update({
+  id: '/room/$roomId',
+  path: '/room/$roomId',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -66,8 +60,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset': typeof AuthResetRoute
-  '/app/chat/$chatId': typeof AppChatChatIdRoute
-  '/app/group/$groupId': typeof AppGroupGroupIdRoute
+  '/app/room/$roomId': typeof AppRoomRoomIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -76,8 +69,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset': typeof AuthResetRoute
-  '/app/chat/$chatId': typeof AppChatChatIdRoute
-  '/app/group/$groupId': typeof AppGroupGroupIdRoute
+  '/app/room/$roomId': typeof AppRoomRoomIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -87,8 +79,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset': typeof AuthResetRoute
-  '/app/chat/$chatId': typeof AppChatChatIdRoute
-  '/app/group/$groupId': typeof AppGroupGroupIdRoute
+  '/app/room/$roomId': typeof AppRoomRoomIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -99,8 +90,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset'
-    | '/app/chat/$chatId'
-    | '/app/group/$groupId'
+    | '/app/room/$roomId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -109,8 +99,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset'
-    | '/app/chat/$chatId'
-    | '/app/group/$groupId'
+    | '/app/room/$roomId'
   id:
     | '__root__'
     | '/'
@@ -119,8 +108,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset'
-    | '/app/chat/$chatId'
-    | '/app/group/$groupId'
+    | '/app/room/$roomId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -173,31 +161,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/app/group/$groupId': {
-      id: '/app/group/$groupId'
-      path: '/group/$groupId'
-      fullPath: '/app/group/$groupId'
-      preLoaderRoute: typeof AppGroupGroupIdRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/chat/$chatId': {
-      id: '/app/chat/$chatId'
-      path: '/chat/$chatId'
-      fullPath: '/app/chat/$chatId'
-      preLoaderRoute: typeof AppChatChatIdRouteImport
+    '/app/room/$roomId': {
+      id: '/app/room/$roomId'
+      path: '/room/$roomId'
+      fullPath: '/app/room/$roomId'
+      preLoaderRoute: typeof AppRoomRoomIdRouteImport
       parentRoute: typeof AppRoute
     }
   }
 }
 
 interface AppRouteChildren {
-  AppChatChatIdRoute: typeof AppChatChatIdRoute
-  AppGroupGroupIdRoute: typeof AppGroupGroupIdRoute
+  AppRoomRoomIdRoute: typeof AppRoomRoomIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppChatChatIdRoute: AppChatChatIdRoute,
-  AppGroupGroupIdRoute: AppGroupGroupIdRoute,
+  AppRoomRoomIdRoute: AppRoomRoomIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
