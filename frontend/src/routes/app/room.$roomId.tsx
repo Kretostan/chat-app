@@ -6,13 +6,9 @@ export const Route = createFileRoute("/app/room/$roomId")({
     if (!response.ok) throw redirect({ to: "/auth/login" });
   },
   loader: async ({ params }) => {
-    console.log(params.roomId);
     const response = await fetch(`/api/chat/rooms/${params.roomId}/messages`);
-
-    // TODO: Przed błędem, jeśli będzie 403 (Unauthorized) - przekierowanie do /app
-    if (!response.ok) return { error: "Error while fetching chats" };
-
-    return response;
+    if (!response.ok) throw redirect({ to: "/" });
+    return response.json();
   },
   component: RouteComponent,
 });
