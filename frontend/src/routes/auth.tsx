@@ -3,20 +3,15 @@ import Socials from "@/components/home/footer/Socials";
 import Footer from "@/components/layout/footer/Footer";
 import Navigation from "@/components/layout/navigation/Navigation";
 
-// FIX: Redirect do app na auth jeśli jest zalogowany
 export const Route = createFileRoute("/auth")({
   beforeLoad: async ({ location }) => {
-    if (location.pathname === "/auth") {
+    if (location.pathname === "/auth")
       throw redirect({
         to: "/auth/login",
         replace: true,
       });
-    }
-
     const response = await fetch("/api/auth/profile");
-    if (response.ok) {
-      throw redirect({ to: "/app" });
-    }
+    if (response.ok) throw redirect({ to: "/app" });
   },
   component: AuthLayout,
 });
