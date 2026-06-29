@@ -107,7 +107,6 @@ const Menu = ({
                       {room.type === "dm" ? otherMember?.username : room.name}
                     </p>
                     <p className="text-xs">
-                      {/* !!! WIADOMOŚĆ UŻYTKOWNIKA id. {user.id} !!! */}
                       {room.lastMessage?.content ?? "No messages yet"}
                     </p>
                   </div>
