@@ -13,7 +13,7 @@ export const Route = createFileRoute("/auth")({
       });
     }
 
-    const response = await fetch("/api/auth/me");
+    const response = await fetch("/api/auth/profile");
     if (response.ok) {
       throw redirect({ to: "/app" });
     }
