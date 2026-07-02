@@ -19,6 +19,7 @@ async function main() {
   db.delete(schema.users).run();
   console.log("Cleared existing data.");
 
+  // 1. Tworzenie podstawowych użytkowników
   const [alice] = await db
     .insert(schema.users)
     .values({
@@ -52,205 +53,130 @@ async function main() {
     })
     .returning();
 
-  console.log("Created users:", alice.username, bob.username, charlie.username);
+  console.log("Created core users.");
 
-  const [general] = await db
+  // 2. Generowanie 35 dodatkowych roomów dla Alice
+  console.log("Generating 35 rooms for Alice...");
+  const rooms: (typeof schema.chatRooms.$inferSelect)[] = [];
+  const membersToInsert: { userId: number; chatRoomId: number }[] = [];
+
+  // Pokój w którym będzie 50+ wiadomości
+  const [megaRoom] = await db
     .insert(schema.chatRooms)
-    .values({ name: "General", isPrivate: false, type: "group" })
+    .values({
+      name: "Alice Mega Room 🚀",
+      isPrivate: false,
+      type: "group",
+    })
     .returning();
-
-  const [random] = await db
-    .insert(schema.chatRooms)
-    .values({ name: "Random", isPrivate: false, type: "group" })
-    .returning();
-
-  const [secret] = await db
-    .insert(schema.chatRooms)
-    .values({ name: "Secret", isPrivate: true, type: "group" })
-    .returning();
-
-  const [dmAliceBob] = await db
-    .insert(schema.chatRooms)
-    .values({ name: null, isPrivate: true, type: "dm" })
-    .returning();
-
-  const [dmAliceCharlie] = await db
-    .insert(schema.chatRooms)
-    .values({ name: null, isPrivate: true, type: "dm" })
-    .returning();
-
-  const [dmBobCharlie] = await db
-    .insert(schema.chatRooms)
-    .values({ name: null, isPrivate: true, type: "dm" })
-    .returning();
-
-  console.log(
-    "Created rooms:",
-    general.name,
-    random.name,
-    secret.name,
-    "(+3 DMs)",
+  rooms.push(megaRoom);
+  membersToInsert.push(
+    { userId: alice.id, chatRoomId: megaRoom.id },
+    { userId: bob.id, chatRoomId: megaRoom.id },
   );
 
-  const baseTime = new Date("2025-01-01T10:00:00.000Z");
+  // Pętla tworząca pozostałe pokoje (mix grup i DM)
+  for (let i = 1; i <= 34; i++) {
+    const isPrivate = i % 2 === 0;
+    const type = i % 3 === 0 ? "dm" : "group";
 
-  const messagesData = [
-    {
-      content: "Hey everyone! 👋",
-      userId: alice.id,
-      chatRoomId: general.id,
-      createdAt: new Date(baseTime.getTime() + 0 * 60000).toISOString(),
-    },
-    {
-      content: "Hi Alice! How are you?",
-      userId: bob.id,
-      chatRoomId: general.id,
-      createdAt: new Date(baseTime.getTime() + 1 * 60000).toISOString(),
-    },
-    {
-      content: "Doing great, thanks! Ready to build this chat app 🚀",
-      userId: alice.id,
-      chatRoomId: general.id,
-      createdAt: new Date(baseTime.getTime() + 2 * 60000).toISOString(),
-    },
-    {
-      content: "Same here! Let's go 💪",
-      userId: charlie.id,
-      chatRoomId: general.id,
-      createdAt: new Date(baseTime.getTime() + 3 * 60000).toISOString(),
-    },
-    {
-      content: "Good night everyone! 🌙",
-      userId: charlie.id,
-      chatRoomId: general.id,
-      createdAt: new Date(baseTime.getTime() + 4 * 60000).toISOString(),
-    },
-    {
-      content: "Anyone tried the new feature?",
-      userId: bob.id,
-      chatRoomId: random.id,
-      createdAt: new Date(baseTime.getTime() + 5 * 60000).toISOString(),
-    },
-    {
-      content: "Not yet, what is it?",
-      userId: alice.id,
-      chatRoomId: random.id,
-      createdAt: new Date(baseTime.getTime() + 6 * 60000).toISOString(),
-    },
-    {
-      content: "Real-time messaging with WebSockets!",
-      userId: bob.id,
-      chatRoomId: random.id,
-      createdAt: new Date(baseTime.getTime() + 7 * 60000).toISOString(),
-    },
-    {
-      content: "Sounds awesome 🔥",
-      userId: charlie.id,
-      chatRoomId: random.id,
-      createdAt: new Date(baseTime.getTime() + 8 * 60000).toISOString(),
-    },
-    {
-      content: "I'll check it out tonight",
-      userId: alice.id,
-      chatRoomId: random.id,
-      createdAt: new Date(baseTime.getTime() + 9 * 60000).toISOString(),
-    },
-    {
-      content: "Secret project update: v2 ships next week 🤫",
-      userId: alice.id,
-      chatRoomId: secret.id,
-      createdAt: new Date(baseTime.getTime() + 10 * 60000).toISOString(),
-    },
-    // DM: alice ↔ bob
-    {
-      content: "Got any plans for the weekend?",
-      userId: alice.id,
-      chatRoomId: dmAliceBob.id,
-      createdAt: new Date(baseTime.getTime() + 11 * 60000).toISOString(),
-    },
-    {
-      content: "Not yet, you?",
-      userId: bob.id,
-      chatRoomId: dmAliceBob.id,
-      createdAt: new Date(baseTime.getTime() + 12 * 60000).toISOString(),
-    },
-    // DM: alice ↔ charlie
-    {
-      content: "Did you see the PR I pushed?",
-      userId: alice.id,
-      chatRoomId: dmAliceCharlie.id,
-      createdAt: new Date(baseTime.getTime() + 13 * 60000).toISOString(),
-    },
-    // DM: bob ↔ charlie
-    {
-      content: "Wanna grab a coffee later?",
-      userId: bob.id,
-      chatRoomId: dmBobCharlie.id,
-      createdAt: new Date(baseTime.getTime() + 14 * 60000).toISOString(),
-    },
-    {
-      content: "Sure! ☕",
-      userId: charlie.id,
-      chatRoomId: dmBobCharlie.id,
-      createdAt: new Date(baseTime.getTime() + 15 * 60000).toISOString(),
-    },
-  ];
+    const [room] = await db
+      .insert(schema.chatRooms)
+      .values({
+        name: type === "dm" ? null : `Projekt ${i} - Dyskusja`,
+        isPrivate,
+        type,
+      })
+      .returning();
 
-  db.insert(schema.chatRoomMembers)
-    .values([
-      { userId: alice.id, chatRoomId: general.id },
-      { userId: bob.id, chatRoomId: general.id },
-      { userId: charlie.id, chatRoomId: general.id },
-      { userId: alice.id, chatRoomId: random.id },
-      { userId: bob.id, chatRoomId: random.id },
-      { userId: charlie.id, chatRoomId: random.id },
-      { userId: alice.id, chatRoomId: secret.id },
-      { userId: bob.id, chatRoomId: secret.id },
-      // DM members
-      { userId: alice.id, chatRoomId: dmAliceBob.id },
-      { userId: bob.id, chatRoomId: dmAliceBob.id },
-      { userId: alice.id, chatRoomId: dmAliceCharlie.id },
-      { userId: charlie.id, chatRoomId: dmAliceCharlie.id },
-      { userId: bob.id, chatRoomId: dmBobCharlie.id },
-      { userId: charlie.id, chatRoomId: dmBobCharlie.id },
-    ])
-    .run();
+    rooms.push(room);
 
-  console.log("Created chat room members");
-
-  for (const msg of messagesData) {
-    await db.insert(schema.messages).values(msg);
+    // Zawsze dodajemy Alice
+    membersToInsert.push({ userId: alice.id, chatRoomId: room.id });
+    // Losowo dodajemy Boba lub Charliego, żeby pokoje nie były puste
+    if (i % i === 0 || i % 2 === 0)
+      membersToInsert.push({ userId: bob.id, chatRoomId: room.id });
+    if (i % i === 0 || i % 3 === 0)
+      membersToInsert.push({ userId: charlie.id, chatRoomId: room.id });
   }
 
-  console.log(`Seeded ${messagesData.length} messages`);
+  // Wrzucamy wszystkich członków jednym insertem (baza odetchnie)
+  db.insert(schema.chatRoomMembers).values(membersToInsert).run();
+  console.log(`Created ${rooms.length} rooms and assigned members.`);
 
+  // 3. Generowanie wiadomości
+  const baseTime = new Date("2025-01-01T10:00:00.000Z");
+  let messageCounter = 0;
+
+  console.log("Generating 50+ messages for 'Alice Mega Room'...");
+
+  // Szablony losowych tekstów, żeby czat wyglądał naturalnie
+  const dummyPhrases = [
+    "Jak tam projekt?",
+    "Widzieliście nowy update?",
+    "Musimy to przegadać.",
+    "Działa to u Was?",
+    "Dobra robota!",
+    "Sprawdźcie wolną chwilą.",
+    "Odpalam deployment 🚀",
+    "Mamy buga na produkcji 🐛",
+    "Kto ma czas na calla?",
+    "Jasne, nie ma problemu.",
+    "Zrobione!",
+    "Można mergować.",
+    "Dzięki za info!",
+  ];
+  const users = [alice, bob, charlie];
+
+  // Generujemy 55 wiadomości w Mega Roomie
+  for (let i = 0; i < 55; i++) {
+    const randomUser = users[Math.floor(Math.random() * users.length)];
+    const randomText =
+      dummyPhrases[Math.floor(Math.random() * dummyPhrases.length)];
+    const timeOffset = messageCounter++ * 30000; // co 30 sekund
+
+    await db.insert(schema.messages).values({
+      content: `${randomText} (Wiadomość #${i + 1})`,
+      userId: randomUser.id,
+      chatRoomId: megaRoom.id,
+      createdAt: new Date(baseTime.getTime() + timeOffset).toISOString(),
+    });
+  }
+
+  // Dodajmy po jednej startowej wiadomości do pozostałych pokoi, żeby nie świeciły pustkami
+  console.log("Adding initial messages to other rooms...");
+  for (const room of rooms) {
+    if (room.id === megaRoom.id) continue;
+    const timeOffset = messageCounter++ * 60000;
+
+    const [insertedMsg] = await db
+      .insert(schema.messages)
+      .values({
+        content: `Cześć! Witamy w pokoju: ${room.name ?? "Direct Message"} 👋`,
+        userId: alice.id,
+        chatRoomId: room.id,
+        createdAt: new Date(baseTime.getTime() + timeOffset).toISOString(),
+      })
+      .returning();
+
+    // Od razu aktualizujemy lastMessageAt dla tego pokoju
+    db.update(schema.chatRooms)
+      .set({ lastMessageAt: insertedMsg.createdAt })
+      .where(eq(schema.chatRooms.id, room.id))
+      .run();
+  }
+
+  // Na koniec aktualizujemy lastMessageAt dla Mega Roomu (będzie miał najświeższą datę)
+  const lastMegaRoomTime = new Date(
+    baseTime.getTime() + messageCounter * 30000,
+  ).toISOString();
   db.update(schema.chatRooms)
-    .set({ lastMessageAt: messagesData[4].createdAt })
-    .where(eq(schema.chatRooms.id, general.id))
-    .run();
-  db.update(schema.chatRooms)
-    .set({ lastMessageAt: messagesData[9].createdAt })
-    .where(eq(schema.chatRooms.id, random.id))
-    .run();
-  db.update(schema.chatRooms)
-    .set({ lastMessageAt: messagesData[10].createdAt })
-    .where(eq(schema.chatRooms.id, secret.id))
-    .run();
-  db.update(schema.chatRooms)
-    .set({ lastMessageAt: messagesData[12].createdAt })
-    .where(eq(schema.chatRooms.id, dmAliceBob.id))
-    .run();
-  db.update(schema.chatRooms)
-    .set({ lastMessageAt: messagesData[13].createdAt })
-    .where(eq(schema.chatRooms.id, dmAliceCharlie.id))
-    .run();
-  db.update(schema.chatRooms)
-    .set({ lastMessageAt: messagesData[15].createdAt })
-    .where(eq(schema.chatRooms.id, dmBobCharlie.id))
+    .set({ lastMessageAt: lastMegaRoomTime })
+    .where(eq(schema.chatRooms.id, megaRoom.id))
     .run();
 
-  console.log("Updated lastMessageAt for rooms");
-  console.log("Done! ✅");
+  console.log("Updated lastMessageAt for all rooms.");
+  console.log("Done! ✅ Baza została pomyślnie zapełniona.");
 }
 
 main().catch(console.error);

@@ -20,7 +20,6 @@ export const messageSchema = z.object({
   id: z.number(),
   content: z.string().min(1).max(4000),
   userId: z.number(),
-  chatRoomId: z.number(),
   createdAt: z.iso.datetime(),
   clientMessageId: z.string().nullable(),
 });
@@ -63,5 +62,34 @@ export const chatRoomDetailsSchema = chatRoomSchema.extend({
   lastMessage: lastMessageInfoSchema.nullable(),
 });
 
+export const messagesPaginationSchema = z.object({
+  cursor: z.coerce.number().optional(),
+  limit: z.coerce.number().min(1).max(100).default(50),
+});
+
+export const roomsPaginationSchema = z.object({
+  cursor: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z\|\d+$/)
+    .optional(),
+  limit: z.coerce.number().min(1).max(100).default(30),
+});
+
+export const paginatedMessagesSchema = z.object({
+  messages: z.array(messageSchema),
+  hasMore: z.boolean(),
+  cursor: z.number().nullable(),
+});
+
+export const paginatedRoomsSchema = z.object({
+  rooms: z.array(chatRoomDetailsSchema),
+  hasMore: z.boolean(),
+  cursor: z.string().nullable(),
+});
+
 export type RoomMemberInfo = z.infer<typeof roomMemberInfoSchema>;
 export type ChatRoomDetails = z.infer<typeof chatRoomDetailsSchema>;
+export type PaginatedMessages = z.infer<typeof paginatedMessagesSchema>;
+export type MessagesPagination = z.infer<typeof messagesPaginationSchema>;
+export type RoomsPagination = z.infer<typeof roomsPaginationSchema>;
+export type PaginatedRooms = z.infer<typeof paginatedRoomsSchema>;
