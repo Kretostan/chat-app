@@ -2,19 +2,45 @@
 
 ## Transport
 
-- **Library:** Socket.io (NestJS Gateway).
-- **Auth:** JWT extracted from `Cookie` during the handshake.
+- **Library:** `ws` via `@nestjs/platform-ws` (NestJS Gateway).
+- **Port:** Same as HTTP (`:3001` dev / `:3000` prod).
+- **Auth:** JWT from httpOnly cookie `access_token`. Browser sends it automatically (same origin). Verified in `handleConnection` via `JwtService`.
+
+## Wire format
+
+All messages are **JSON strings**:
+
+### Client → Server
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event` | `string` | Event name |
+| `data` | `object` | Payload |
+| `ackId` | `string?` | Optional ACK identifier |
+
+### Server → Client
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event` | `string` | Event name |
+| `data` | `object` | Payload |
+
+### ACK (Server → Client)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event` | `"ack"` | Fixed identifier |
+| `data.ackId` | `string` | ID from the original request |
+| `data.status` | `"ok" \| "error"` | Operation status |
+| `data.data` | `object?` | Payload on success |
+| `data.message` | `string?` | Error message |
 
 ## Rules
 
-- **Reconnect:** Client uses *Exponential Backoff* (start: 1s, max: 30s).
-- **ACK (Acknowledgment):** **YES**. The client waits for a server callback
-after sending a message. If a timeout occurs (5s),
-the UI displays a "failed to send" state.
-- **Idempotency:** `clientMessageId` is **required**. The server ignores messages
-with duplicate IDs from the same sender.
-- **Room Logic:** Upon connection, the server automatically joins the socket
-to rooms named after the `chatRoomId`.
+- **Reconnect:** Exponential backoff (1s → 30s), client-side
+- **ACK:** Client waits for ACK with matching `ackId`. 5s timeout → UI shows "failed to send"
+- **Idempotency:** `clientMessageId` — unique constraint `(userId, clientMessageId)` in DB
+- **Room Logic:** Server manages a `roomId → Set<WebSocket>` map via `WsService`
 
 ## Events (MVP)
 
@@ -22,17 +48,27 @@ to rooms named after the `chatRoomId`.
 
 | Event | Payload | Description |
 |-------|---------|-------------|
-| `room:create` | `{ userIds: number[] }` | Create a conversation (DM or group) |
-| `room:join` | `{ roomId }` | Join a room (subscribe to events) |
 | `message:send` | `{ roomId, content, clientMessageId }` | Send a message |
+| `room:join` | `{ roomId }` | Subscribe to a room |
 
 ### Server → Client
 
 | Event | Payload | Description |
 |-------|---------|-------------|
-| `room:created` | `{ id, name, type, isPrivate, createdAt }` | Confirmation with new room data |
-| `message:new` | `{ id, userId, chatRoomId, content, createdAt, clientMessageId }` | Broadcast new message to room |
-| `exception` | `{ status: "error", message: string }` | Validation or permission error |
+| `message:new` | `{ id, userId, chatRoomId, content, createdAt, clientMessageId }` | New message in room |
+| `exception` | `{ status: "error", message }` | Validation or auth error |
+
+## Production (Nginx)
+
+```nginx
+location /ws {
+    proxy_pass http://backend:3000;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    ...
+}
+```
 
 ## v0.2 Signaling (Multimedia)
 
