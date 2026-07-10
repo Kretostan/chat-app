@@ -11,7 +11,6 @@ export const publicUserSchema = z.object({
 export interface AuthUser {
   id: number;
   username: string;
-  email: string;
   sessionId: number;
 }
 
