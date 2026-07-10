@@ -39,11 +39,12 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           credentials: true,
         },
-      },
-    },
-    resolve: {
-      alias: {
-        "@": path.resolve(__dirname, "src"),
+        "/ws": {
+          target: env.VITE_API_URL,
+          changeOrigin: true,
+          credentials: true,
+          ws: true,
+        },
       },
     },
   };
