@@ -24,8 +24,11 @@ export default defineConfig(({ mode }) => {
       svgr(),
       tailwindcss(),
     ],
-    optimizeDeps: {
-      include: ["shared"],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "src"),
+        shared: path.resolve(__dirname, "../packages/shared/src/index.ts"),
+      },
     },
     server: {
       host: "0.0.0.0",
@@ -35,7 +38,6 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_API_URL,
           changeOrigin: true,
           credentials: true,
-          rewrite: (path) => path.replace(/^\/api/, ""),
         },
       },
     },
