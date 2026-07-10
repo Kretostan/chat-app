@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const chatRoomSchema = z.object({
   id: z.number(),
-  name: z.string().max(12).nullable(),
-  type: z.string().default("dm"),
+  name: z.string().max(12).nullable().default(null),
+  type: z.enum(["dm", "group"]).default("dm"),
   isPrivate: z.boolean().default(true),
   createdAt: z.iso.datetime(),
   lastMessageAt: z.string().nullable(),
@@ -24,16 +24,24 @@ export const messageSchema = z.object({
   clientMessageId: z.string().nullable(),
 });
 
+export const broadcastMessageSchema = messageSchema.extend({
+  chatRoomId: z.number(),
+});
+
 export const createRoomSchema = z
   .object({
-    name: z.string().max(12).optional(),
-    type: z.string().default("dm"),
+    name: z.string().max(12).nullable().default(null),
+    type: z.enum(["dm", "group"]).default("dm"),
     isPrivate: z.boolean().default(true),
-    userIds: z.array(z.number()).min(2),
+    members: z.array(z.number()).min(2),
   })
-  .refine((data) => data.type !== "group" || !!data.name, {
+  .refine((data) => data.type !== "group" || data.name !== null, {
     error: "Group requires a name",
     path: ["name"],
+  })
+  .refine((data) => data.type !== "dm" || data.isPrivate, {
+    error: "Private room should be private",
+    path: ["isPrivate"],
   });
 
 export const createMessageSchema = z.object({
@@ -93,3 +101,5 @@ export type PaginatedMessages = z.infer<typeof paginatedMessagesSchema>;
 export type MessagesPagination = z.infer<typeof messagesPaginationSchema>;
 export type RoomsPagination = z.infer<typeof roomsPaginationSchema>;
 export type PaginatedRooms = z.infer<typeof paginatedRoomsSchema>;
+export type BroadcastMessage = z.infer<typeof broadcastMessageSchema>;
+export type CreateRoomValues = z.infer<typeof createRoomSchema>;
