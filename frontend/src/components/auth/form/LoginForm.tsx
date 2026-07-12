@@ -11,10 +11,11 @@ const LoginForm = () => {
   const navigate = useNavigate({ from: "/auth/login" });
 
   const { values, handleChange } = useAuthForm({
-    login: "",
+    username: "",
     password: "",
   });
-  const isValid = loginFormSchema.safeParse(values as LoginFormValues).success;
+  // TODO: Zwrócić walidację w hooku
+  const isValid = loginFormSchema.safeParse(values).success;
 
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -23,17 +24,19 @@ const LoginForm = () => {
       ? `${navigator.userAgentData.brands[0].brand}, ${navigator.userAgentData.platform}`
       : navigator.userAgent;
 
-    const stored = localStorage.getItem("sessionUuids");
-    const sessionUuids: Record<string, string> = stored
-      ? JSON.parse(stored)
-      : {};
+    const stored = localStorage.getItem("sessions");
+    const recentUsers: Record<
+      number,
+      { username: string; sessionUuid: string }
+    > = stored ? JSON.parse(stored) : {};
 
-    const loginKey = (values as LoginFormValues).login;
-    let sessionUuid = sessionUuids[loginKey];
-    if (!sessionUuid) {
-      sessionUuid = crypto.randomUUID();
-      sessionUuids[loginKey] = sessionUuid;
-    }
+    const loginKey = (values as LoginFormValues).username;
+    const matchedEntry = Object.entries(recentUsers).find(
+      ([_, user]) => user.username === loginKey,
+    );
+    const sessionUuid = matchedEntry
+      ? matchedEntry[1].sessionUuid
+      : crypto.randomUUID();
 
     const response = await fetch("/api/auth/login", {
       method: "POST",
@@ -45,17 +48,19 @@ const LoginForm = () => {
       }),
     });
 
+    const data = await response.json();
     if (!response.ok) {
-      const data = await response.json();
       return setError(data.message);
     }
+    const { username, userId } = data;
+    recentUsers[userId] = { username, sessionUuid };
 
-    localStorage.setItem("sessionUuids", JSON.stringify(sessionUuids));
+    localStorage.setItem("sessions", JSON.stringify(recentUsers));
     navigate({ to: "/app" });
   };
 
   const fields = [
-    { name: "login", type: "text", placeholder: "Username or email" },
+    { name: "username", type: "text", placeholder: "Username" },
     { name: "password", type: "password", placeholder: "Password" },
   ];
 

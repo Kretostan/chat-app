@@ -13,7 +13,7 @@ export const registerSchema = z
   });
 
 export const loginFormSchema = z.object({
-  login: z.string().min(3, "Login is required").max(30),
+  username: z.string().min(3, "Username is required").max(30),
   password: z.string().min(8, "Password minimum 8 characters").max(128),
 });
 

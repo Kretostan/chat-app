@@ -44,15 +44,15 @@ export class AuthService {
   }
 
   async login(
-    login: string,
+    username: string,
     password: string,
     deviceName: string,
     sessionUuid: string,
-  ): Promise<string> {
+  ): Promise<{ token: string; username: string; userId: number }> {
     const [user] = await this.databaseService.db
       .select()
       .from(users)
-      .where(or(eq(users.email, login), eq(users.username, login)))
+      .where(eq(users.username, username))
       .limit(1);
 
     if (!user) {
@@ -64,11 +64,6 @@ export class AuthService {
       throw new ConflictException("Invalid credentials");
     }
 
-    const payload = {
-      sub: user.id,
-      username: user.username,
-    };
-
     const [existingSession] = await this.databaseService.db
       .select()
       .from(sessions)
@@ -78,6 +73,8 @@ export class AuthService {
           eq(sessions.userId, user.id),
         ),
       );
+
+    let newSessionId: number;
 
     if (!existingSession) {
       const [newSession] = await this.databaseService.db
@@ -90,21 +87,23 @@ export class AuthService {
         })
         .returning();
 
-      // INFO: GDZIE? \/
-      // FIX: Sesje, które wysłał frontend, a nie ma ich na backendzie
-
-      return this.jwtService.sign({ ...payload, sessionId: newSession.id });
+      newSessionId = newSession.id;
+    } else {
+      await this.databaseService.db
+        .update(sessions)
+        .set({ lastUsedAt: sql`datetime('now')` })
+        .where(eq(sessions.id, existingSession.id));
     }
 
-    await this.databaseService.db
-      .update(sessions)
-      .set({ lastUsedAt: sql`datetime('now')` })
-      .where(eq(sessions.id, existingSession.id));
-
-    return this.jwtService.sign({
-      ...payload,
-      sessionId: existingSession.id,
-    });
+    return {
+      token: this.jwtService.sign({
+        sub: user.id,
+        username: user.username,
+        sessionId: existingSession ? existingSession.id : newSessionId,
+      }),
+      userId: user.id,
+      username: user.username,
+    };
   }
 
   async sessions(user: AuthUser) {

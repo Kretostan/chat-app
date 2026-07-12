@@ -36,8 +36,8 @@ export class AuthController {
     @Body(new ZodValidationPipe(loginSchema)) dto: LoginValues,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const token = await this.authService.login(
-      dto.login,
+    const { token, username, userId } = await this.authService.login(
+      dto.username,
       dto.password,
       dto.deviceName,
       dto.sessionUuid,
@@ -50,7 +50,7 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
     });
-    return;
+    return { username, userId };
   }
 
   @Post("/logout")
