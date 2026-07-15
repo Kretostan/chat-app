@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "b95a60f5-a805-4a16-be12-7d8603f7efd2",
+  "id": "23e7e884-40b2-4a73-9e66-68b9269e0952",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "chat_room_members": {
@@ -126,10 +126,31 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "creator_id": {
+          "name": "creator_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "chat_rooms_creator_id_users_id_fk": {
+          "name": "chat_rooms_creator_id_users_id_fk",
+          "tableFrom": "chat_rooms",
+          "tableTo": "users",
+          "columnsFrom": [
+            "creator_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -261,9 +282,25 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "session_uuid": {
+          "name": "session_uuid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "uq_user_session_uuid": {
+          "name": "uq_user_session_uuid",
+          "columns": [
+            "user_id",
+            "session_uuid"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "sessions_user_id_users_id_fk": {
           "name": "sessions_user_id_users_id_fk",
