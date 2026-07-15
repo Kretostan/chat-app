@@ -1,8 +1,14 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { and, desc, eq, inArray, lt, sql } from "drizzle-orm";
-import { PaginatedMessages, PaginatedRooms } from "shared";
+import {
+  CreateRoomResult,
+  CreateRoomValues,
+  createRoomSchema,
+  PaginatedMessages,
+  PaginatedRooms,
+} from "shared";
 import { DatabaseService } from "src/db/database.service";
-import { chatRoomMembers, chatRooms, messages } from "src/db/schema";
+import { chatRoomMembers, chatRooms, messages, users } from "src/db/schema";
 
 @Injectable()
 export class ChatService {
@@ -81,8 +87,7 @@ export class ChatService {
       ? (() => {
           const last = items[items.length - 1];
           const userMember = last.members.find(
-            (member) => member.userId,
-            userId,
+            (member) => member.userId === userId,
           );
           const sortValue =
             last.lastMessageAt ?? userMember?.joinedAt ?? last.createdAt;
@@ -164,5 +169,125 @@ export class ChatService {
     const nextCursor = hasMore ? items[items.length - 1].id : null;
 
     return { messages: items, hasMore, cursor: nextCursor };
+  }
+
+  async sendMessage(
+    userId: number,
+    data: { roomId: number; content: string; clientMessageId: string },
+  ) {
+    const [member] = await this.databaseService.db
+      .select()
+      .from(chatRoomMembers)
+      .where(
+        and(
+          eq(chatRoomMembers.userId, userId),
+          eq(chatRoomMembers.chatRoomId, data.roomId),
+        ),
+      );
+    if (!member) return { status: "error", message: "Not a member" };
+
+    try {
+      const [message] = await this.databaseService.db
+        .insert(messages)
+        .values({
+          content: data.content,
+          userId,
+          chatRoomId: data.roomId,
+          clientMessageId: data.clientMessageId,
+        })
+        .returning();
+
+      await this.databaseService.db
+        .update(chatRooms)
+        .set({ lastMessageAt: sql`datetime('now')` })
+        .where(eq(chatRooms.id, data.roomId));
+
+      return { status: "ok", message };
+    } catch (error) {
+      if (error?.code === "SQLITE_CONSTRAINT_UNIQUE") {
+        const [existing] = await this.databaseService.db
+          .select()
+          .from(messages)
+          .where(
+            and(
+              eq(messages.userId, userId),
+              eq(messages.clientMessageId, data.clientMessageId),
+            ),
+          );
+        return { status: "ok", message: existing };
+      }
+      throw error;
+    }
+  }
+
+  async createRoom(
+    userId: number,
+    data: CreateRoomValues,
+  ): Promise<CreateRoomResult> {
+    const validatedData = createRoomSchema.parse(data);
+
+    if (validatedData.members.length < 2)
+      return {
+        status: "error" as const,
+        message: "Chat members don't exist",
+      };
+
+    const existingUsers = await this.databaseService.db
+      .select()
+      .from(users)
+      .where(inArray(users.id, validatedData.members));
+
+    const existingIds = new Set(existingUsers.map((user) => user.id));
+    const nonExisting = validatedData.members.filter(
+      (id) => !existingIds.has(id),
+    );
+
+    if (nonExisting.length > 0)
+      return { status: "error" as const, message: "Some users not found" };
+
+    const [{ roomId }] = await this.databaseService.db
+      .insert(chatRooms)
+      .values({
+        creatorId: userId,
+        name: validatedData.name,
+        type: validatedData.type,
+        isPrivate: validatedData.isPrivate,
+      })
+      .returning({ roomId: chatRooms.id });
+
+    await this.databaseService.db.insert(chatRoomMembers).values(
+      validatedData.members.map((memberId) => ({
+        chatRoomId: roomId,
+        userId: memberId,
+      })),
+    );
+
+    const populatedRoom = await this.loadRoomDetails(roomId, userId);
+    return { status: "ok", populatedRoom };
+  }
+
+  async joinRoom(userId: number, roomId: number): Promise<CreateRoomResult> {
+    const [member] = await this.databaseService.db
+      .select()
+      .from(chatRoomMembers)
+      .where(
+        and(
+          eq(chatRoomMembers.userId, userId),
+          eq(chatRoomMembers.chatRoomId, roomId),
+        ),
+      );
+
+    if (member) return { status: "error", message: "User already in room" };
+
+    const [newMember] = await this.databaseService.db
+      .insert(chatRoomMembers)
+      .values({
+        chatRoomId: roomId,
+        userId,
+      })
+      .returning();
+
+    const room = await this.loadRoomDetails(roomId, newMember.id);
+    return { status: "ok" as const, populatedRoom: room };
   }
 }
