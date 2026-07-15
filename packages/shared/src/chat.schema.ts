@@ -42,6 +42,10 @@ export const createRoomSchema = z
   .refine((data) => data.type !== "dm" || data.isPrivate, {
     error: "Private room should be private",
     path: ["isPrivate"],
+  })
+  .refine((data) => data.type !== "dm" || data.members.length === 2, {
+    error: "Private room should has maximum two members",
+    path: ["members"],
   });
 
 export const createMessageSchema = z.object({
@@ -102,4 +106,19 @@ export type MessagesPagination = z.infer<typeof messagesPaginationSchema>;
 export type RoomsPagination = z.infer<typeof roomsPaginationSchema>;
 export type PaginatedRooms = z.infer<typeof paginatedRoomsSchema>;
 export type BroadcastMessage = z.infer<typeof broadcastMessageSchema>;
+export const createRoomResultSchema = z.discriminatedUnion("status", [
+  z.object({
+    status: z.literal("ok"),
+    populatedRoom: chatRoomDetailsSchema.omit({
+      lastMessageAt: true,
+      createdAt: true,
+    }),
+  }),
+  z.object({
+    status: z.literal("error"),
+    message: z.string(),
+  }),
+]);
+
 export type CreateRoomValues = z.infer<typeof createRoomSchema>;
+export type CreateRoomResult = z.infer<typeof createRoomResultSchema>;
