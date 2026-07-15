@@ -12,7 +12,6 @@
 - `password_hash`: text
 - `avatar_url`: text (nullable)
 - `created_at`: text (ISO 8601, default: now)
-- ~~`token_version`: integer (default: 0, incremented on logout)~~ *(removed from Drizzle schema — pending migration drop; per-device session management via `sessions` table)*
 
 ### chat_rooms
 

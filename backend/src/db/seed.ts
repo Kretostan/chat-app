@@ -18,6 +18,7 @@ async function main() {
   db.delete(schema.sessions).run();
   db.delete(schema.users).run();
   console.log("Cleared existing data.");
+  sqlite.exec("DELETE FROM sqlite_sequence");
 
   // 1. Tworzenie podstawowych użytkowników
   const [alice] = await db
@@ -67,6 +68,7 @@ async function main() {
       name: "Alice Mega Room 🚀",
       isPrivate: false,
       type: "group",
+      creatorId: alice.id,
     })
     .returning();
   rooms.push(megaRoom);
@@ -86,6 +88,7 @@ async function main() {
         name: type === "dm" ? null : `Projekt ${i} - Dyskusja`,
         isPrivate,
         type,
+        creatorId: alice.id,
       })
       .returning();
 
