@@ -138,8 +138,9 @@ describe("WsService", () => {
           createdAt: new Date().toISOString(),
           chatRoomId: 42,
         },
+        ackId: "abc-123",
       };
-      await service.handleSendMessage(42, message, s1);
+      await service.handleSendMessage(42, message);
 
       // s1 (sender) SHOULD also receive the broadcast back
       expect(s1.send).toHaveBeenCalled();
@@ -171,8 +172,9 @@ describe("WsService", () => {
           createdAt: new Date().toISOString(),
           chatRoomId: 42,
         },
+        ackId: "abc-123",
       };
-      await service.handleSendMessage(42, message, s3);
+      await service.handleSendMessage(42, message);
 
       expect(s1.send).toHaveBeenCalled();
       expect(s2Client.send).toHaveBeenCalled();
@@ -206,6 +208,7 @@ describe("WsService", () => {
           createdAt: new Date().toISOString(),
           chatRoomId: 42,
         },
+        ackId: "abc-123",
       };
       await service.handleSendMessage(42, message);
 
@@ -232,6 +235,7 @@ describe("WsService", () => {
           createdAt: new Date().toISOString(),
           chatRoomId: 42,
         },
+        ackId: "abc-123",
       };
       await expect(
         service.handleSendMessage(42, message),
@@ -275,10 +279,11 @@ describe("WsService", () => {
         }),
       } as never);
 
-      await service.handleRoomCreate(
-        { event: "room:created", data: mockRoom },
-        s1,
-      );
+      await service.handleRoomCreate({
+        event: "room:created",
+        data: mockRoom,
+        ackId: "abc-123",
+      });
 
       // creator also receives room:created broadcast
       expect(s1.send).toHaveBeenCalled();
@@ -320,12 +325,13 @@ describe("WsService", () => {
         }),
       } as never);
 
-      await service.handleRoomCreate(
-        { event: "room:created", data: mockRoom },
-        s1,
-      );
+      await service.handleRoomCreate({
+        event: "room:created",
+        data: mockRoom,
+        ackId: "abc-123",
+      });
 
-      expect(s1.send).not.toHaveBeenCalled(); // sender excluded
+      expect(s1.send).toHaveBeenCalled(); // sender excluded
     });
 
     it("should handle empty member list gracefully", async () => {
@@ -349,7 +355,11 @@ describe("WsService", () => {
       } as never);
 
       await expect(
-        service.handleRoomCreate({ event: "room:created", data: mockRoom }, s1),
+        service.handleRoomCreate({
+          event: "room:created",
+          data: mockRoom,
+          ackId: "abc-123",
+        }),
       ).resolves.toBeUndefined();
     });
   });
@@ -375,10 +385,18 @@ describe("WsService", () => {
         lastMessage: null,
       };
 
-      await service.handleRoomJoin({ event: "room:joined", data: mockRoom });
+      await service.handleRoomJoin({
+        event: "room:joined",
+        data: mockRoom,
+        ackId: "abc-123",
+      });
 
       expect(s1.send).toHaveBeenCalledWith(
-        JSON.stringify({ event: "room:joined", data: mockRoom }),
+        JSON.stringify({
+          event: "room:joined",
+          data: mockRoom,
+          ackId: "abc-123",
+        }),
       );
     });
 
@@ -400,7 +418,11 @@ describe("WsService", () => {
       } as never);
 
       await expect(
-        service.handleRoomJoin({ event: "room:joined", data: mockRoom }),
+        service.handleRoomJoin({
+          event: "room:joined",
+          data: mockRoom,
+          ackId: "abc-123",
+        }),
       ).resolves.toBeUndefined();
     });
   });
