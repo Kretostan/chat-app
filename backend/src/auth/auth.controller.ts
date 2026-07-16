@@ -7,7 +7,7 @@ import {
   Res,
   UseGuards,
 } from "@nestjs/common";
-import { type Response } from "express";
+import type { FastifyReply } from "fastify";
 import {
   type AuthUser,
   type LoginValues,
@@ -34,7 +34,7 @@ export class AuthController {
   @Post("/login")
   async login(
     @Body(new ZodValidationPipe(loginSchema)) dto: LoginValues,
-    @Res({ passthrough: true }) response: Response,
+    @Res({ passthrough: true }) response: FastifyReply,
   ) {
     const { token, username, userId } = await this.authService.login(
       dto.username,
@@ -43,7 +43,7 @@ export class AuthController {
       dto.sessionUuid,
     );
 
-    response.cookie("access_token", token, {
+    response.setCookie("access_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -55,7 +55,7 @@ export class AuthController {
 
   @Post("/logout")
   @UseGuards(JwtAuthGuard)
-  async logout(@Res({ passthrough: true }) response: Response) {
+  async logout(@Res({ passthrough: true }) response: FastifyReply) {
     response.clearCookie("access_token", { path: "/" });
     return;
   }
