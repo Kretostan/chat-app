@@ -7,6 +7,7 @@ import {
   Res,
   UseGuards,
 } from "@nestjs/common";
+import { Throttle } from "@nestjs/throttler";
 import type { FastifyReply } from "fastify";
 import {
   type AuthUser,
@@ -80,4 +81,8 @@ export class AuthController {
   ) {
     return this.authService.removeSession(params, user.sessionId);
   }
+
+  @Post("/reset")
+  @Throttle({ auth: { ttl: 600_000, limit: 3 } })
+  async resetPassword() {}
 }
