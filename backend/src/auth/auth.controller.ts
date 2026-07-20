@@ -33,6 +33,7 @@ export class AuthController {
   }
 
   @Post("/login")
+  @Throttle({ auth: { ttl: 900_000, limit: 10 } })
   async login(
     @Body(new ZodValidationPipe(loginSchema)) dto: LoginValues,
     @Res({ passthrough: true }) response: FastifyReply,
