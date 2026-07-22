@@ -12,6 +12,45 @@ const createMockSocket = (id: number) =>
     user: { id, username: `user${id}`, sessionId: 1 },
   }) as unknown as WebSocket;
 
+// --- Helper functions to build Drizzle Query Builder mocks ---
+
+/**
+ * Builds a mock that resolves to members for db.select().from().where() chain.
+ */
+const mockDbSuccess = (service: WsService, userIds: number[]) => {
+  jest
+    .spyOn(service["databaseService"].db as never, "select")
+    .mockReturnValueOnce({
+      from: jest.fn().mockReturnValueOnce({
+        where: jest
+          .fn()
+          .mockResolvedValue(userIds.map((id) => ({ userId: id }))),
+      }),
+    } as never);
+};
+
+const mockDbEmpty = (service: WsService) => {
+  jest
+    .spyOn(service["databaseService"].db as never, "select")
+    .mockReturnValueOnce({
+      from: jest.fn().mockReturnValueOnce({
+        where: jest.fn().mockResolvedValue([]),
+      }),
+    } as never);
+};
+
+const mockDbError = (service: WsService, message = "DB query failed") => {
+  jest
+    .spyOn(service["databaseService"].db as never, "select")
+    .mockReturnValueOnce({
+      from: jest.fn().mockReturnValueOnce({
+        where: jest.fn().mockRejectedValue(new Error(message)),
+      }),
+    } as never);
+};
+
+// --- Tests --------------------------------------------------------------------
+
 describe("WsService", () => {
   let service: WsService;
 
@@ -117,17 +156,7 @@ describe("WsService", () => {
       service.addClient(s1);
       service.addClient(s2);
 
-      const mockMembers = [
-        { userId: 1 },
-        { userId: 2 },
-        { userId: 3 }, // not connected
-      ];
-
-      (service["databaseService"].db.select as jest.Mock).mockReturnValueOnce({
-        from: jest.fn().mockReturnValueOnce({
-          where: jest.fn().mockResolvedValue(mockMembers),
-        }),
-      } as never);
+      mockDbSuccess(service, [1, 2, 3]); // member 3 not connected
 
       const message = {
         event: "message:new",
@@ -157,11 +186,7 @@ describe("WsService", () => {
       service.addClient(s2Client);
       service.addClient(s3);
 
-      jest.spyOn(service["databaseService"].db, "select").mockReturnValueOnce({
-        from: jest.fn().mockReturnValueOnce({
-          where: jest.fn().mockResolvedValue([{ userId: 1 }, { userId: 2 }]),
-        }),
-      } as never);
+      mockDbSuccess(service, [1, 2]);
 
       const message = {
         event: "message:new",
@@ -193,11 +218,7 @@ describe("WsService", () => {
       service.addClient(s1);
       service.addClient(sClosing);
 
-      jest.spyOn(service["databaseService"].db, "select").mockReturnValueOnce({
-        from: jest.fn().mockReturnValueOnce({
-          where: jest.fn().mockResolvedValue([{ userId: 1 }, { userId: 2 }]),
-        }),
-      } as never);
+      mockDbSuccess(service, [1, 2]);
 
       const message = {
         event: "message:new",
@@ -217,14 +238,7 @@ describe("WsService", () => {
     });
 
     it("should not throw when some members have no sockets", async () => {
-      jest.spyOn(service["databaseService"].db, "select").mockReturnValueOnce({
-        from: jest.fn().mockReturnValueOnce({
-          where: jest.fn().mockResolvedValue([
-            { userId: 100 }, // not connected
-            { userId: 200 }, // also not connected
-          ]),
-        }),
-      } as never);
+      mockDbSuccess(service, [100, 200]); // none connected
 
       const message = {
         event: "message:new",
@@ -241,10 +255,64 @@ describe("WsService", () => {
         service.handleSendMessage(42, message),
       ).resolves.toBeUndefined();
     });
+
+    it("should not crash when database query throws", async () => {
+      const s1 = createMockSocket(1);
+      service.addClient(s1);
+
+      mockDbError(service, "SQLITE_BUSY: database is locked");
+
+      const message = {
+        event: "message:new",
+        data: {
+          id: 1,
+          content: "hi",
+          userId: 1,
+          createdAt: new Date().toISOString(),
+          chatRoomId: 42,
+        },
+        ackId: "abc-123",
+      };
+
+      await expect(service.handleSendMessage(42, message)).rejects.toThrow(
+        "SQLITE_BUSY",
+      );
+    });
+
+    it("should handle member with multiple sockets and mixed readyState", async () => {
+      const sOpen = createMockSocket(1);
+      const sClosed: WebSocket = createMockSocket(1) as unknown as WebSocket;
+      Object.defineProperty(sClosed, "readyState", {
+        value: WebSocket.CLOSED,
+        writable: true,
+        configurable: true,
+      });
+      service.addClient(sOpen);
+      service.addClient(sClosed);
+
+      mockDbSuccess(service, [1]);
+
+      const message = {
+        event: "message:new",
+        data: {
+          id: 1,
+          content: "hi",
+          userId: 1,
+          chatRoomId: 42,
+          createdAt: new Date().toISOString(),
+          clientMessageId: crypto.randomUUID(),
+        },
+        ackId: "abc-123",
+      };
+      await service.handleSendMessage(2, message);
+
+      expect(sOpen.send).toHaveBeenCalled();
+      expect(sClosed.send).not.toHaveBeenCalled();
+    });
   });
 
   describe("handleRoomCreate", () => {
-    it("should broadcast room creation to all members except sender", async () => {
+    it("should broadcast room creation to all members", async () => {
       const s1 = createMockSocket(1);
       const s2 = createMockSocket(2);
       service.addClient(s1);
@@ -273,11 +341,7 @@ describe("WsService", () => {
         lastMessage: null,
       };
 
-      jest.spyOn(service["databaseService"].db, "select").mockReturnValueOnce({
-        from: jest.fn().mockReturnValueOnce({
-          where: jest.fn().mockResolvedValue([{ userId: 1 }, { userId: 2 }]),
-        }),
-      } as never);
+      mockDbSuccess(service, [1, 2]);
 
       await service.handleRoomCreate({
         event: "room:created",
@@ -319,11 +383,7 @@ describe("WsService", () => {
         lastMessage: null,
       };
 
-      jest.spyOn(service["databaseService"].db, "select").mockReturnValueOnce({
-        from: jest.fn().mockReturnValueOnce({
-          where: jest.fn().mockResolvedValue([{ userId: 1 }, { userId: 3 }]),
-        }),
-      } as never);
+      mockDbSuccess(service, [1, 3]);
 
       await service.handleRoomCreate({
         event: "room:created",
@@ -331,7 +391,7 @@ describe("WsService", () => {
         ackId: "abc-123",
       });
 
-      expect(s1.send).toHaveBeenCalled(); // sender excluded
+      expect(s1.send).toHaveBeenCalled();
     });
 
     it("should handle empty member list gracefully", async () => {
@@ -348,11 +408,7 @@ describe("WsService", () => {
         lastMessage: null,
       };
 
-      jest.spyOn(service["databaseService"].db, "select").mockReturnValueOnce({
-        from: jest.fn().mockReturnValueOnce({
-          where: jest.fn().mockResolvedValue([]),
-        }),
-      } as never);
+      mockDbEmpty(service);
 
       await expect(
         service.handleRoomCreate({
@@ -362,6 +418,38 @@ describe("WsService", () => {
         }),
       ).resolves.toBeUndefined();
     });
+
+    it("should not crash when database query throws", async () => {
+      const s1 = createMockSocket(1);
+      service.addClient(s1);
+
+      const mockRoom: ChatRoomDetails = {
+        id: 99,
+        name: "My Room",
+        type: "dm",
+        isPrivate: true,
+        createdAt: new Date().toISOString(),
+        members: [
+          {
+            id: 1,
+            username: "user1",
+            avatarUrl: null,
+            joinedAt: new Date().toISOString(),
+          },
+        ],
+        lastMessage: null,
+      };
+
+      mockDbError(service, "database timeout");
+
+      await expect(
+        service.handleRoomCreate({
+          event: "room:created",
+          data: mockRoom,
+          ackId: "abc-123",
+        }),
+      ).rejects.toThrow("timeout");
+    });
   });
 
   describe("handleRoomJoin", () => {
@@ -369,11 +457,7 @@ describe("WsService", () => {
       const s1 = createMockSocket(1);
       service.addClient(s1);
 
-      jest.spyOn(service["databaseService"].db, "select").mockReturnValueOnce({
-        from: jest.fn().mockReturnValueOnce({
-          where: jest.fn().mockResolvedValue([{ userId: 1 }]),
-        }),
-      } as never);
+      mockDbSuccess(service, [1]);
 
       const mockRoom: ChatRoomDetails = {
         id: 42,
@@ -401,6 +485,8 @@ describe("WsService", () => {
     });
 
     it("should not throw if user has no socket connections", async () => {
+      mockDbSuccess(service, [999]);
+
       const mockRoom: ChatRoomDetails = {
         id: 99,
         name: null,
@@ -411,12 +497,6 @@ describe("WsService", () => {
         lastMessage: null,
       };
 
-      jest.spyOn(service["databaseService"].db, "select").mockReturnValueOnce({
-        from: jest.fn().mockReturnValueOnce({
-          where: jest.fn().mockResolvedValue([{ userId: 999 }]),
-        }),
-      } as never);
-
       await expect(
         service.handleRoomJoin({
           event: "room:joined",
@@ -424,6 +504,28 @@ describe("WsService", () => {
           ackId: "abc-123",
         }),
       ).resolves.toBeUndefined();
+    });
+
+    it("should not crash when database query throws", async () => {
+      mockDbError(service, "SQLITE_BUSY");
+
+      const mockRoom: ChatRoomDetails = {
+        id: 99,
+        name: null,
+        type: "dm",
+        isPrivate: false,
+        createdAt: new Date().toISOString(),
+        members: [],
+        lastMessage: null,
+      };
+
+      await expect(
+        service.handleRoomJoin({
+          event: "room:joined",
+          data: mockRoom,
+          ackId: "abc-123",
+        }),
+      ).rejects.toThrow("SQLITE_BUSY");
     });
   });
 });
