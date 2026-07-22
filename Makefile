@@ -22,10 +22,10 @@ test-backend-e2e:
 	pnpm --filter backend test:e2e
 
 test-frontend:
-	pnpm --filter frontend test
+	pnpm --filter frontend test:run
 
 test-frontend-watch:
-	pnpm --filter frontend test:run
+	pnpm --filter frontend test
 
 ### Docker ###
 dev-up:
