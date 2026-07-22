@@ -36,7 +36,7 @@ export class WsService {
 
   async handleSendMessage(
     roomId: number,
-    message: { event: string; data: BroadcastMessage; ackId?: string },
+    message: { event: string; data: BroadcastMessage; ackId: string },
   ) {
     const members = await this.databaseService.db
       .select({

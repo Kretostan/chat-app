@@ -184,7 +184,7 @@ export class ChatService {
           eq(chatRoomMembers.chatRoomId, data.roomId),
         ),
       );
-    if (!member) return { status: "error", message: "Not a member" };
+    if (!member) return { status: "error" as const, message: "Not a member" };
 
     try {
       const [message] = await this.databaseService.db
