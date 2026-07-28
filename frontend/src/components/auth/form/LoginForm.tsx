@@ -52,10 +52,16 @@ const LoginForm = () => {
     if (!response.ok) {
       return setError(data.message);
     }
-    const { username, userId } = data;
-    recentUsers[userId] = { username, sessionUuid };
 
-    localStorage.setItem("sessions", JSON.stringify(recentUsers));
+    const { username, userId } = data;
+    const existingSession = Object.values(recentUsers).find(
+      (entry) => entry.sessionUuid === sessionUuid,
+    );
+    if (!recentUsers[userId] || existingSession) {
+      recentUsers[userId] = { username, sessionUuid };
+      localStorage.setItem("sessions", JSON.stringify(recentUsers));
+    }
+
     navigate({ to: "/app" });
   };
 

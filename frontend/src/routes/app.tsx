@@ -7,29 +7,22 @@ import Navigation from "@/components/layout/navigation/Navigation";
 import { useMobile } from "@/hooks";
 
 export const Route = createFileRoute("/app")({
-  beforeLoad: async () => {
-    const response = await fetch("/api/auth/profile");
-    if (!response.ok) {
-      throw redirect({ to: "/auth/login" });
-    }
-  },
   loader: async (): Promise<{
     user: PublicUser;
     rooms: ChatRoomDetails[] | [];
   }> => {
     const [userResponse, roomsReponse] = await Promise.all([
-      await fetch("/api/auth/profile"),
-      await fetch("/api/chat/rooms"),
+      fetch("/api/auth/profile"),
+      fetch("/api/chat/rooms"),
     ]);
 
-    if (!userResponse.ok)
-      throw new Error(`Response status: ${userResponse.status}`);
+    if (!userResponse.ok) throw redirect({ to: "/auth/login" });
     if (!roomsReponse.ok)
-      throw new Error(`Response status: ${roomsReponse.status}`);
+      throw new Error(`Rooms fetch failed: ${roomsReponse.status}`);
 
     const [user, rooms] = await Promise.all([
-      await userResponse.json(),
-      await roomsReponse.json(),
+      userResponse.json(),
+      roomsReponse.json(),
     ]);
 
     return { user, rooms };
@@ -41,6 +34,7 @@ function RouteComponent() {
   const isMobile = useMobile();
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const { user, rooms } = Route.useLoaderData();
+
   const navigate = useNavigate({ from: Route.fullPath });
 
   return (
