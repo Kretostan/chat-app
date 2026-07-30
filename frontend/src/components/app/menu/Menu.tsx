@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import type { ChatRoomDetails, RoomMemberInfo } from "shared";
+import type { PaginatedRooms, RoomMemberInfo } from "shared";
 import Add from "@/assets/add-mark.svg?react";
 import Arrow from "@/assets/arrow-narrow.svg?react";
 import Ellipsis from "@/assets/ellipsis.svg?react";
@@ -9,11 +9,11 @@ import { useMobile } from "@/hooks";
 
 const Menu = ({
   currentUserId,
-  rooms,
+  data,
   onSelect,
 }: {
   currentUserId: number;
-  rooms: ChatRoomDetails[];
+  data: PaginatedRooms;
   onSelect: () => void;
 }) => {
   const isMobile = useMobile();
@@ -80,14 +80,12 @@ const Menu = ({
         </button>
       </div>
       {/* USERS LIST */}
-      <ul className="flex flex-col gap-2 h-full">
-        {rooms.length ? (
-          rooms.map((room) => {
+      <ul className="flex flex-col gap-2 h-full overflow-scroll">
+        {data.rooms.length ? (
+          data.rooms.map((room) => {
             const otherMember =
               room.type === "dm"
-                ? (room.members.find(
-                    (member) => member.id !== currentUserId,
-                  ) as RoomMemberInfo)
+                ? room.members.find((member) => member.id !== currentUserId)
                 : null;
             return (
               <motion.li

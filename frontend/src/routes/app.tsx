@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import type { ChatRoomDetails, PublicUser } from "shared";
-import Content from "@/components/app/content/Content";
+import type { PaginatedRooms, PublicUser } from "shared";
+import EmptyContent from "@/components/app/content/EmptyContent";
 import Menu from "@/components/app/menu/Menu";
 import Navigation from "@/components/layout/navigation/Navigation";
 import { useMobile } from "@/hooks";
@@ -9,7 +9,7 @@ import { useMobile } from "@/hooks";
 export const Route = createFileRoute("/app")({
   loader: async (): Promise<{
     user: PublicUser;
-    rooms: ChatRoomDetails[] | [];
+    roomsData: PaginatedRooms;
   }> => {
     const [userResponse, roomsReponse] = await Promise.all([
       fetch("/api/auth/profile"),
@@ -20,12 +20,12 @@ export const Route = createFileRoute("/app")({
     if (!roomsReponse.ok)
       throw new Error(`Rooms fetch failed: ${roomsReponse.status}`);
 
-    const [user, rooms] = await Promise.all([
+    const [user, roomsData] = await Promise.all([
       userResponse.json(),
       roomsReponse.json(),
     ]);
 
-    return { user, rooms };
+    return { user, roomsData };
   },
   component: RouteComponent,
 });
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/app")({
 function RouteComponent() {
   const isMobile = useMobile();
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const { user, rooms } = Route.useLoaderData();
+  const { user, roomsData } = Route.useLoaderData();
 
   const navigate = useNavigate({ from: Route.fullPath });
 
@@ -68,12 +68,12 @@ function RouteComponent() {
         {showMenu && (
           <Menu
             currentUserId={user.id}
-            rooms={rooms}
+            data={roomsData}
             onSelect={() => setShowMenu((prev) => !prev)}
           />
         )}
         {(!isMobile || !showMenu) && (
-          <Content onBack={() => setShowMenu((prev) => !prev)} />
+          <EmptyContent onBack={() => setShowMenu((prev) => !prev)} />
         )}
       </div>
     </div>
