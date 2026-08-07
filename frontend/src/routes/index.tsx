@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import Cta from "@/components/home/cta/Cta";
 import Features from "@/components/home/features/Features";
+import Socials from "@/components/home/footer/Socials";
 import Hero from "@/components/home/Hero";
 import List from "@/components/home/navigation/List";
 import MobileList from "@/components/home/navigation/MobileList";
-import Stats from "@/components/home/stats/Stats";
 import Footer from "@/components/layout/footer/Footer";
 import Navigation from "@/components/layout/navigation/Navigation";
 import PrimaryButton from "@/components/layout/navigation/PrimaryButton";
@@ -22,16 +22,19 @@ function RouteComponent() {
       <Navigation>
         {isMobile ? <MobileList /> : <List />}
         <PrimaryButton onClick={() => navigate({ to: "/auth/login" })}>
-          Go in
+          Sign in
         </PrimaryButton>
       </Navigation>
       <Hero />
-      <main className="flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center">
         <Features />
-        <Stats />
         <Cta />
-      </main>
-      <Footer />
+      </div>
+      <div className="w-full">
+        <Footer>
+          <Socials />
+        </Footer>
+      </div>
     </>
   );
 }

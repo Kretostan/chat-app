@@ -1,27 +1,21 @@
-import { motion } from "framer-motion";
-
-interface PrimaryButtonProps {
+interface NavButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
 }
 
-const PrimaryButton = ({ children, onClick }: PrimaryButtonProps) => {
+const NavButton = ({ children, onClick }: NavButtonProps) => {
   return (
-    <motion.button
-      initial={{
-        backgroundColor: "rgba(var(--primary-raw), 1)",
-        boxShadow: "0 0 0px 0px var(--primary)",
-      }}
-      whileHover={{
-        backgroundColor: "rgba(var(--primary-raw), 0.8)",
-        boxShadow: "0 0 10px 1px var(--primary)",
-      }}
+    <button
+      type="button"
       onClick={onClick}
-      className="py-3 w-20 md:w-24 bg-primary text-sm md:text-base text-foreground-primary font-medium rounded-lg shadow-none cursor-pointer"
+      className="group py-3 px-5 text-sm font-medium rounded-lg cursor-pointer relative transition-all duration-300
+        border border-white/10 hover:border-primary hover:bg-primary"
     >
-      {children}
-    </motion.button>
+      <span className="relative flex items-center gap-1.5 text-white/70 group-hover:text-black transition-colors duration-300">
+        {children}
+      </span>
+    </button>
   );
 };
 
-export default PrimaryButton;
+export default NavButton;

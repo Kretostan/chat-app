@@ -4,7 +4,6 @@ import { useMobile } from "@/hooks";
 
 const sections = [
   { label: "Features", href: "features" },
-  { label: "Why Us", href: "stats" },
   { label: "Get Started", href: "cta" },
   { label: "Contact", href: "contact" },
 ];

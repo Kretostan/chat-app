@@ -25,7 +25,7 @@ const socials: { href: string; label: string; Icon: IconComponent }[] = [
 
 const hoverEffect = {
   y: -2,
-  color: "#fff",
+  color: "var(--foreground-primary)",
   backgroundColor: "var(--primary)",
 };
 
