@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { type SubmitEvent, useState } from "react";
 import { type LoginFormValues, loginFormSchema } from "shared";
+import { UAParser } from "ua-parser-js";
 import { useAuthForm } from "@/hooks";
 import Alert from "../Alert";
 import Button from "./Button";
@@ -10,19 +11,16 @@ const LoginForm = () => {
   const [error, setError] = useState<string>("");
   const navigate = useNavigate({ from: "/auth/login" });
 
-  const { values, handleChange } = useAuthForm({
-    username: "",
-    password: "",
-  });
-  // TODO: Zwrócić walidację w hooku
+  const { values, handleChange } = useAuthForm({ username: "", password: "" });
   const isValid = loginFormSchema.safeParse(values).success;
 
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const deviceName = navigator?.userAgentData
-      ? `${navigator.userAgentData.brands[0].brand}, ${navigator.userAgentData.platform}`
-      : navigator.userAgent;
+    const parser = new UAParser();
+
+    const device = parser.getDevice().type;
+    const deviceName = `${device ? device : ""} ${parser.getOS()} ${parser.getBrowser().name}`;
 
     const stored = localStorage.getItem("sessions");
     const recentUsers: Record<
@@ -43,15 +41,13 @@ const LoginForm = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...values,
-        deviceName: deviceName,
-        sessionUuid: sessionUuid,
+        deviceName,
+        sessionUuid,
       }),
     });
 
     const data = await response.json();
-    if (!response.ok) {
-      return setError(data.message);
-    }
+    if (!response.ok) return setError(data.message);
 
     const { username, userId } = data;
     const existingSession = Object.values(recentUsers).find(
@@ -62,7 +58,7 @@ const LoginForm = () => {
       localStorage.setItem("sessions", JSON.stringify(recentUsers));
     }
 
-    navigate({ to: "/app" });
+    navigate({ to: "/app", replace: true });
   };
 
   const fields = [
@@ -71,8 +67,11 @@ const LoginForm = () => {
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-10 w-full">
-      <div className="flex flex-col gap-4">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col items-center gap-10 w-full"
+    >
+      <div className="flex flex-col gap-4 max-w-xs w-full">
         {fields.map((field) => (
           <Input
             key={field.name}
@@ -81,7 +80,7 @@ const LoginForm = () => {
             name={field.name}
             placeholder={field.placeholder}
             autoComplete={field.name === "password" ? "new-password" : "off"}
-            value={(values as any)[field.name]}
+            value={(values as Record<string, string>)[field.name]}
           />
         ))}
       </div>

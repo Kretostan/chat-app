@@ -1,14 +1,24 @@
-import type { InputHTMLAttributes } from "react";
-
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {}
-
-const Input = ({ ...props }: InputProps) => {
-  return (
+const Input = ({
+  name,
+  children,
+  ...props
+}: {
+  name: string;
+  children: React.ReactNode;
+}) => (
+  <>
+    <label
+      htmlFor={name}
+      className="text-xs font-medium text-foreground-secondary uppercase tracking-wider ml-0.5"
+    >
+      {children}
+    </label>
     <input
+      name={name}
       {...props}
-      className="px-3 py-2 bg-surface-input outline-2 outline-border-input rounded-lg"
+      className="w-full px-4 py-3 text-sm bg-surface-input border border-border-default rounded-lg outline-none transition-all placeholder:text-foreground-muted focus:border-primary"
     />
-  );
-};
+  </>
+);
 
 export default Input;

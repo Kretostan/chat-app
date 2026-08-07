@@ -27,3 +27,22 @@ export type LoginFormValues = z.infer<typeof loginFormSchema>;
 export type LoginValues = z.infer<typeof loginSchema>;
 
 export type AuthValues = RegisterValues | LoginFormValues;
+
+export const changeEmailSchema = z.object({
+  email: z.email("Wprowadź poprawny adres e-mail"),
+});
+
+export const confirmPasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Wprowadź obecne hasło"),
+  newPassword: z
+    .string()
+    .min(8, "Hasło musi mieć przynajmniej 8 znaków")
+    .max(128),
+  confirmPassword: z.string(),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  error: "Hasła nie są identyczne",
+  path: ["confirmPassword"],
+});
+
+export type ChangeEmailValues = z.infer<typeof changeEmailSchema>;
+export type ConfirmPasswordValues = z.infer<typeof confirmPasswordSchema>;

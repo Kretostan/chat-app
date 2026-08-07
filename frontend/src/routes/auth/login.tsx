@@ -1,42 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
+import BreathingIndicator from "@/components/auth/BreathingIndicator";
 import Footer from "@/components/auth/Footer";
 import LoginForm from "@/components/auth/form/LoginForm";
 import Header from "@/components/auth/Header";
-import Photo from "@/components/auth/login/Photo";
 
 export const Route = createFileRoute("/auth/login")({
   component: RouteComponent,
 });
 
-type RecentSession = { username: string; sessionUuid: string };
-
 function RouteComponent() {
-  const stored = localStorage.getItem("sessions");
-  const sessions: RecentSession[] | null = stored
-    ? Object.values(JSON.parse(stored))
-    : null;
-
   return (
-    <div className="flex justify-center items-center gap-20 min-h-screen my-22 md:my-0">
-      {sessions?.length && (
-        <ul>
-          {sessions?.map(({ username, sessionUuid }) => (
-            <li key={sessionUuid}>{username}</li>
-          ))}
-        </ul>
-      )}
-      <Photo />
-      <div className="flex flex-col justify-center items-center gap-3 w-90">
-        <div className="flex flex-col justify-center items-center gap-6 px-8 py-10 w-full bg-surface-section border-3 border-border-default rounded-2xl">
-          <Header title="Chat App" description="Welcome back!" />
+    <div className="flex flex-col justify-center items-center min-h-screen my-20">
+      <div className="flex flex-col items-center gap-3 w-full max-w-sm px-6">
+        <Header title="Welcome back" description="Log in to your account" />
+        <BreathingIndicator />
+        <div className="flex flex-col justify-center items-center gap-6 px-8 py-10 w-full bg-surface-section border border-border-default rounded-2xl auth-card-shadow">
           <LoginForm />
         </div>
-        <Footer
-          text="Don't have ana account?"
-          linkText="Sign up"
-          to="/auth/register"
-        />
       </div>
+      <Footer
+        text="Don't have an account?"
+        linkText="Sign up"
+        to="/auth/register"
+      />
     </div>
   );
 }
