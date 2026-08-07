@@ -15,7 +15,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthResetRouteImport } from './routes/auth/reset'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as AppRoomRoomIdRouteImport } from './routes/app/room.$roomId'
+import { Route as AppSettingsRouteImport } from './routes/app/settings'
+import { Route as AppChatRouteImport } from './routes/app/chat'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -47,9 +48,14 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
-const AppRoomRoomIdRoute = AppRoomRoomIdRouteImport.update({
-  id: '/room/$roomId',
-  path: '/room/$roomId',
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppChatRoute = AppChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -57,29 +63,32 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/app/chat': typeof AppChatRoute
+  '/app/settings': typeof AppSettingsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset': typeof AuthResetRoute
-  '/app/room/$roomId': typeof AppRoomRoomIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/app/chat': typeof AppChatRoute
+  '/app/settings': typeof AppSettingsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset': typeof AuthResetRoute
-  '/app/room/$roomId': typeof AppRoomRoomIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/app/chat': typeof AppChatRoute
+  '/app/settings': typeof AppSettingsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset': typeof AuthResetRoute
-  '/app/room/$roomId': typeof AppRoomRoomIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,28 +96,31 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/app/chat'
+    | '/app/settings'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset'
-    | '/app/room/$roomId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/app'
     | '/auth'
+    | '/app/chat'
+    | '/app/settings'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset'
-    | '/app/room/$roomId'
   id:
     | '__root__'
     | '/'
     | '/app'
     | '/auth'
+    | '/app/chat'
+    | '/app/settings'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset'
-    | '/app/room/$roomId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -161,22 +173,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/app/room/$roomId': {
-      id: '/app/room/$roomId'
-      path: '/room/$roomId'
-      fullPath: '/app/room/$roomId'
-      preLoaderRoute: typeof AppRoomRoomIdRouteImport
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/chat': {
+      id: '/app/chat'
+      path: '/chat'
+      fullPath: '/app/chat'
+      preLoaderRoute: typeof AppChatRouteImport
       parentRoute: typeof AppRoute
     }
   }
 }
 
 interface AppRouteChildren {
-  AppRoomRoomIdRoute: typeof AppRoomRoomIdRoute
+  AppChatRoute: typeof AppChatRoute
+  AppSettingsRoute: typeof AppSettingsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppRoomRoomIdRoute: AppRoomRoomIdRoute,
+  AppChatRoute: AppChatRoute,
+  AppSettingsRoute: AppSettingsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
