@@ -12,8 +12,8 @@ import { UsersModule } from "./users/users.module";
   imports: [
     ThrottlerModule.forRoot({
       throttlers: [
-        { name: "default", ttl: 60000, limit: 600 },
-        { name: "auth", ttl: 900000, limit: 5 },
+        { name: "default", ttl: 300_000, limit: 3000 },
+        { name: "auth", ttl: 900_000, limit: 350 },
       ],
     }),
     DatabaseModule,

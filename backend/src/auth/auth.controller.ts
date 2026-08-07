@@ -26,6 +26,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post("/register")
+  @Throttle({ register: { ttl: 60_000, limit: 5 } })
   async register(
     @Body(new ZodValidationPipe(registerSchema)) dto: RegisterValues,
   ) {
