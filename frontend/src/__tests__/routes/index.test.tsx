@@ -6,6 +6,7 @@ import {
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { routeTree } from "../../routeTree.gen";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 async function createTestRouter(initialPath = "/") {
   const history = createMemoryHistory({ initialEntries: [initialPath] });
@@ -23,7 +24,11 @@ async function createTestRouter(initialPath = "/") {
 async function renderPage(initialPath = "/") {
   const testRouter = await createTestRouter(initialPath);
 
-  const result = render(<RouterProvider router={testRouter} />);
+  const result = render(
+    <ThemeProvider>
+      <RouterProvider router={testRouter} />
+    </ThemeProvider>,
+  );
 
   return { ...result, router: testRouter };
 }
@@ -33,7 +38,7 @@ describe("Landing Page", () => {
     test("Go in button navigates to /auth/login on click", async () => {
       const page = await renderPage();
 
-      const goInButton = screen.getByRole("button", { name: /Go in/i });
+      const goInButton = screen.getByRole("button", { name: "Sign in" });
 
       await userEvent.click(goInButton);
 
