@@ -17,3 +17,6 @@ data/
 .pnpm-store
 
 *.tsbuildinfo
+
+bruno/.env
+bruno/.bruno
