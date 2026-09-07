@@ -12,8 +12,8 @@ describe("Button", () => {
     const { container } = render(<Button disabled={true} text="Wyslij" />);
     const button = container.querySelector("button");
     expect(button).not.toBeNull();
-    expect(button).toHaveClass("bg-secondary");
-    expect(button).toHaveClass("cursor-not-allowed");
+    expect(button).toHaveClass("disabled:bg-surface-elevated");
+    expect(button).toHaveClass("disabled:cursor-not-allowed");
   });
 
   it("displays enabled styles when disabled is false", async () => {
