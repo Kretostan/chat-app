@@ -10,8 +10,8 @@
     "biome:format": "biome format . --write",
     "biome:check": "biome check .",
     "preview": "vite preview",
-    "test": "vitest",
-    "test:run": "vitest run"
+    "test": "vitest run",
+    "test:run": "vitest"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",
