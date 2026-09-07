@@ -32,7 +32,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run Biome check
-        run: pnpm exec biome ci .
+        run: |
+          pnpm --filter backend biome ci .
+          pnpm --filter frontend biome ci .
 
   test:
     name: Test ${{ matrix.project }}
