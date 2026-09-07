@@ -5,8 +5,7 @@ dist
 .env
 .env.development
 !.env.example
-
-.env*
+!.env.test
 
 data/
 
