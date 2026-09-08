@@ -1,9 +1,8 @@
 services:
   backend:
-    build:
-      context: .
-      target: prod
-      dockerfile: Dockerfile.backend
+    image: ghcr.io/kretostan/chat-app/backend:latest
+    container_name: chat-app-backend
+    restart: always
     environment:
       - NODE_ENV=production
       - DATABASE_URL=file:/app/data/chat.db
@@ -23,10 +22,9 @@ services:
       start_period: 10s
 
   frontend:
-    build:
-      context: .
-      target: prod
-      dockerfile: Dockerfile.frontend
+    image: ghcr.io/kretostan/chat-app/frontend:latest
+    container_name: chat-app-frontend
+    restart: always
     ports:
       - "8080:80"
     depends_on:
