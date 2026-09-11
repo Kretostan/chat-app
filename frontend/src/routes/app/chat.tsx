@@ -96,6 +96,7 @@ function RouteComponent() {
                 stroke="currentColor"
                 strokeWidth={1.7}
                 className="w-5 h-5 text-foreground-secondary"
+                aria-hidden="true"
               >
                 <path
                   d="M9 17V6h6v5.01m-8.5 0h4.5M6 8.5h.01M15.5 8.5H20M11 21h2a3 3 0 003-3v-7H8v7a3 3 0 003 3z"
@@ -115,6 +116,7 @@ function RouteComponent() {
                 stroke="currentColor"
                 strokeWidth={1.7}
                 className="w-5 h-5 text-foreground-secondary"
+                aria-hidden="true"
               >
                 {currentTheme === "system" ? (
                   <path
@@ -147,6 +149,7 @@ function RouteComponent() {
                 strokeWidth={2}
                 strokeLinecap="round"
                 className="w-5 h-5 text-primary"
+                aria-hidden="true"
               >
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />

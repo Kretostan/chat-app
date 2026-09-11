@@ -18,7 +18,7 @@ function getThisDeviceSessionUuid(): string | null {
     const userSession =
       entries.length > 0
         ? entries.find((session) => session.username === "alice")
-        : null;
+        : null; // FIX: Hardcoded username, a powinno być session.userId === user.id
 
     return userSession ? userSession.sessionUuid : null;
   } catch {
@@ -151,6 +151,7 @@ function CurrentDeviceCard({ device }: { device: SessionInfo }) {
           {formatDate(device.lastUsedAt)}
         </p>
       </div>
+      {/* TODO: Sprawdzić */}
       {/* TODO: Chat - what do you think about moving span below above active card, and add button to remove current session. Dodatkowo jeśli miałbym to wdrożyć to trzeba umożliwić na serwerze usuwanie aktywnej sesji. Usunięcie sesji musi też usunąć item z localStorage. Jeśli przeniesiemy "Active" nad kartę to podmienić tu Anuluj + Wyloguj z normalnej karty sesji. */}
       {/* FIX: Jeśli odpali się apkę na Firefox i potem na Chrome, to nie będzie widać na Chrome, odświeżonego odpalenia Firefoxa. */}
       {/* FIX: Dodać React Query i przechowywać tam /user/profile i przy odświeżeniu aktualizować używanie sesji */}
@@ -204,7 +205,7 @@ function DeviceCard({
         {session.deviceName.toLowerCase().includes("windows")
           ? "🖥️"
           : session.deviceName.toLowerCase().includes("mac") ||
-            session.deviceName.toLowerCase().includes("iphone")
+              session.deviceName.toLowerCase().includes("iphone")
             ? "💻"
             : session.deviceName.toLowerCase().includes("linux")
               ? "🐧"
@@ -335,7 +336,8 @@ export default function SessionsPage() {
   const handleCancelConfirm = () => setConfirmId(null);
 
   const handleLogout = async (id: number) => {
-    const sessionToRemove = sessions.find((s) => s.id === id)!;
+    const sessionToRemove = sessions.find((s) => s.id === id);
+    if (!sessionToRemove) return;
 
     // Optimistic remove
     setSessions((prev) => prev.filter((s) => s.id !== id));
@@ -366,9 +368,9 @@ export default function SessionsPage() {
             <div className="h-4 w-52 bg-border-default rounded" />
           </div>
           <div className="space-y-3">
-            {Array.from({ length: 3 }).map((_, i) => (
+            {Array.from({ length: 3 }).map(() => (
               <div
-                key={i}
+                key={crypto.randomUUID()}
                 className="flex items-center gap-4 px-5 py-4 animate-pulse rounded-xl"
                 style={{ background: "var(--surface-section)" }}
               >

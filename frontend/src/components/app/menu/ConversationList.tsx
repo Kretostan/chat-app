@@ -64,52 +64,54 @@ export default function ConversationList({
         const isActive = activeRoomId === room.id;
 
         return (
-          <li
-            key={room.id}
-            onClick={() => onSelect(room.id)}
-            className="flex items-center gap-3 py-3.5 px-4 hover:bg-hover cursor-pointer transition-colors duration-100 w-full"
-            style={{ background: isActive ? "var(--active)" : "transparent" }}
-          >
-            {/* Avatar */}
-            <div
-              className="shrink-0 h-12 w-12 rounded-full flex items-center justify-center text-sm font-medium"
-              style={{
-                background: "var(--surface-input)",
-                color: "var(--foreground-primary)",
-              }}
+          <li key={room.id}>
+            <button
+              type="button"
+              onClick={() => onSelect(room.id)}
+              className="flex items-center gap-3 py-3.5 px-4 hover:bg-hover cursor-pointer transition-colors duration-100 w-full"
+              style={{ background: isActive ? "var(--active)" : "transparent" }}
             >
-              {room.name
-                ? room.name.charAt(0).toUpperCase()
-                : otherMember
-                  ? otherMember.username.charAt(0).toUpperCase()
-                  : "?"}
-            </div>
-
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-center gap-2">
-                <p
-                  className="text-sm font-medium truncate"
-                  style={{ color: "var(--foreground-primary)" }}
-                >
-                  {room.name || otherMember?.username || "?"}
-                </p>
-                {room.lastMessageAt && (
-                  <span className="shrink-0 text-[11px] tabular-nums whitespace-nowrap ml-2 opacity-50">
-                    {formatDate(room.lastMessageAt)}
-                  </span>
-                )}
-              </div>
-              <p
-                className="text-xs truncate"
-                style={{ color: "var(--foreground-secondary)" }}
+              {/* Avatar */}
+              <div
+                className="shrink-0 h-12 w-12 rounded-full flex items-center justify-center text-sm font-medium"
+                style={{
+                  background: "var(--surface-input)",
+                  color: "var(--foreground-primary)",
+                }}
               >
-                {room.name ? "(grupa)" : `od: ${otherMember?.username}`}
-              </p>
-              <p className="text-xs text-foreground-muted/70 overflow-hidden opacity-50">
-                {room.lastMessage?.content ?? "Brak wiadomości"}
-              </p>
-            </div>
+                {room.name
+                  ? room.name.charAt(0).toUpperCase()
+                  : otherMember
+                    ? otherMember.username.charAt(0).toUpperCase()
+                    : "?"}
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-center gap-2">
+                  <p
+                    className="text-sm font-medium truncate"
+                    style={{ color: "var(--foreground-primary)" }}
+                  >
+                    {room.name || otherMember?.username || "?"}
+                  </p>
+                  {room.lastMessageAt && (
+                    <span className="shrink-0 text-[11px] tabular-nums whitespace-nowrap ml-2 opacity-50">
+                      {formatDate(room.lastMessageAt)}
+                    </span>
+                  )}
+                </div>
+                <p
+                  className="text-xs truncate"
+                  style={{ color: "var(--foreground-secondary)" }}
+                >
+                  {room.name ? "(grupa)" : `od: ${otherMember?.username}`}
+                </p>
+                <p className="text-xs text-foreground-muted/70 overflow-hidden opacity-50">
+                  {room.lastMessage?.content ?? "Brak wiadomości"}
+                </p>
+              </div>
+            </button>
           </li>
         );
       })}
