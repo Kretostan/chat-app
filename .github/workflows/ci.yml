@@ -87,6 +87,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Create .env for build
+        if: matrix.project == 'frontend'
+        run: echo "VITE_API_URL=http://localhost:3001" > frontend/.env
+
       - name: Build ${{ matrix.project }}
         run: pnpm --filter ${{ matrix.project }} build
 
