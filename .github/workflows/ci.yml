@@ -128,6 +128,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.frontend
+          build-args: VITE_API_URL=http://backend:3000
           push: true
           tags: ghcr.io/kretostan/chat-app/${{ github.ref_name }}-latest
 
@@ -153,4 +154,4 @@ jobs:
 
       - name: Clean up
         if: always()
-        run: docker compose -p chat-app -f compose.yaml down
+        run: docker compose -p chat-app -f compose.ci.yaml down

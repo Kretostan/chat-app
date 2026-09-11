@@ -37,7 +37,8 @@ FROM deps AS build
 WORKDIR /app
 COPY frontend ./frontend
 WORKDIR /app/frontend
-RUN pnpm build
+ARG VITE_API_URL
+RUN echo "VITE_API_URL=${VITE_API_URL:-http://backend:3000}" > .env && pnpm build
 
 # ==========================================
 # 4. ETAP: PRODUCTION (Nginx)
