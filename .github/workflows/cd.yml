@@ -57,5 +57,5 @@ jobs:
           script: |
             cd ${{ secrets.PROJECT_PATH }}
             podman compose -p chat-app -f compose.yaml pull
-            podman compose -p chat-appp -f compose.yaml up -d
+            podman compose -p chat-app -f compose.yaml up -d
             podman compose image prune -f
