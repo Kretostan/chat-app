@@ -121,7 +121,7 @@ jobs:
           context: .
           file: ./Dockerfile.backend
           push: true
-          tags: ghcr.io/kretostan/chat-app/${{ github.ref_name }}-latest
+          tags: ghcr.io/kretostan/chat-app/backend:${{ github.ref_name }}-latest
 
       - name: Build and push Frontend
         uses: docker/build-push-action@v7
@@ -130,7 +130,7 @@ jobs:
           file: ./Dockerfile.frontend
           build-args: VITE_API_URL=http://backend:3000
           push: true
-          tags: ghcr.io/kretostan/chat-app/${{ github.ref_name }}-latest
+          tags: ghcr.io/kretostan/chat-app/frontend:${{ github.ref_name }}-latest
 
   docker-up:
     if: github.event_name == 'push'
