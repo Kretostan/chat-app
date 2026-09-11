@@ -1,0 +1,5 @@
+services:
+  backend:
+    image: ghcr.io/kretostan/chat-app/backend:${CI_REF}-latest
+  frontend:
+    image: ghcr.io/kretostan/chat-app/frontend:${CI_REF}-latest
