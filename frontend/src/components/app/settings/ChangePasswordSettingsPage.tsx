@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import type { ChangePasswordValues } from "shared";
-import { confirmPasswordSchema } from "shared";
+import { changePasswordSchema } from "shared";
 import Input from "@/components/auth/form/Input";
 
 type PasswordStrength = 0 | 1 | 2 | 3;
@@ -19,12 +19,12 @@ export default function ChangePasswordSettingsPage() {
   const [status, setStatus] = useState<"idle" | "sending">("idle");
   const [error, setError] = useState<string | null>(null);
 
-  const validate = confirmPasswordSchema.safeParse(values);
+  const validate = changePasswordSchema.safeParse(values);
   const valid = validate.success;
   const strength = getPasswordStrength(values.newPassword);
   const requirements = getRequirements(values.newPassword);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     if (!valid) return;
     setError(null);
@@ -267,7 +267,7 @@ function getPasswordStrength(password: string): PasswordStrength {
   if (/[A-Z]/.test(password)) score++;
   if (/\d/.test(password)) score++;
   if (/[^a-zA-Z0-9]/.test(password)) score++;
-  return Math.min(score as PasswordStrength, 3);
+  return Math.min(score as PasswordStrength, 3) as PasswordStrength;
 }
 
 function getRequirements(password: string): StrengthRequirements {
