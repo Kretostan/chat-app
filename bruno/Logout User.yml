@@ -10,8 +10,8 @@ http:
     type: text
     data: |-
       {
-          "login": "email1234@mail.com",
-          "password": "trzasłomasło"
+          "login": "{{email}}",
+          "password": "{{password}}"
       }
 
 settings:

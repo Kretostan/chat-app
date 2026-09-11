@@ -10,8 +10,8 @@ http:
     type: json
     data: |-
       {
-          "username": "alice",
-          "password": "password123",
+          "username": "{{username}}",
+          "password": "{{password}}",
           "deviceName": "Google Chrome, Linux",
           "sessionUuid": "1a0641bc-68ac-4e99-bba2-f67c055407ba"
       }
