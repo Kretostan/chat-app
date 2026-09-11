@@ -1,16 +1,10 @@
-type Message = {
-  id: number;
-  content: string;
-  userId: number;
-  createdAt: string;
-  clientMessageId: string | null;
-};
+import type { RoomMessage } from "shared";
 
 export default function MessageBubble({
   message,
   isOwn,
 }: {
-  message: Message;
+  message: RoomMessage & { username: string | null | undefined };
   isOwn: boolean;
 }) {
   const formattedTime = new Date(message.createdAt).toLocaleTimeString(
