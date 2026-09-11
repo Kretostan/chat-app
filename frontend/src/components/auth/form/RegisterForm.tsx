@@ -38,14 +38,30 @@ const RegisterForm = () => {
   };
 
   const fields = [
-    { name: "email", type: "email", placeholder: "Email" },
-    { name: "password", type: "password", placeholder: "Password" },
+    {
+      name: "email",
+      type: "email",
+      placeholder: "jane@example.com",
+      children: "Email address",
+    },
+    {
+      name: "password",
+      type: "password",
+      placeholder: "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+      children: "Password",
+    },
     {
       name: "confirmPassword",
       type: "password",
-      placeholder: "Confirm Password",
+      placeholder: "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+      children: "Confirm password",
     },
-    { name: "username", type: "text", placeholder: "Username" },
+    {
+      name: "username",
+      type: "text",
+      placeholder: "jane_doe",
+      children: "Username",
+    },
   ];
 
   return (
@@ -60,7 +76,9 @@ const RegisterForm = () => {
             placeholder={field.placeholder}
             autoComplete={field.name === "password" ? "new-password" : "off"}
             value={(values as any)[field.name]}
-          />
+          >
+            {field.children}
+          </Input>
         ))}
       </div>
       {error && <Alert description={error} />}

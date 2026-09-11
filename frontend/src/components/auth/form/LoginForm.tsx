@@ -62,8 +62,18 @@ const LoginForm = () => {
   };
 
   const fields = [
-    { name: "username", type: "text", placeholder: "Username" },
-    { name: "password", type: "password", placeholder: "Password" },
+    {
+      name: "username",
+      type: "text",
+      placeholder: "jane_doe",
+      children: "Username",
+    },
+    {
+      name: "password",
+      type: "password",
+      placeholder: "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+      children: "Password",
+    },
   ];
 
   return (
@@ -81,7 +91,9 @@ const LoginForm = () => {
             placeholder={field.placeholder}
             autoComplete={field.name === "password" ? "new-password" : "off"}
             value={(values as Record<string, string>)[field.name]}
-          />
+          >
+            {field.children}
+          </Input>
         ))}
       </div>
       {error && <Alert description={error} />}
