@@ -35,7 +35,7 @@ jobs:
           tags: ghcr.io/kretostan/chat-app/backend:latest
 
       - name: Build and push frontend
-        uses: docker/build-and-push@v7
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile.frontend
