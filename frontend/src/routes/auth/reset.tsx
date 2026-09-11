@@ -75,11 +75,13 @@ function RouteComponent() {
             <Input
               type="text"
               name="email"
-              placeholder="Username or email"
+              placeholder="jane@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="max-w-xs w-full"
-            />
+            >
+              Username or email
+            </Input>
             {error && <Alert description={error} />}
             <button
               type="submit"

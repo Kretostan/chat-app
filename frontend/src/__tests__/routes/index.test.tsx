@@ -5,8 +5,8 @@ import {
 } from "@tanstack/react-router";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { routeTree } from "../../routeTree.gen";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { routeTree } from "../../routeTree.gen";
 
 async function createTestRouter(initialPath = "/") {
   const history = createMemoryHistory({ initialEntries: [initialPath] });

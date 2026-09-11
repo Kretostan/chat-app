@@ -30,7 +30,7 @@ export default function ThemeSwitcher({
             className="text-foreground-secondary"
             style={current === pref ? { color: "var(--primary)" } : undefined}
           >
-            <div dangerouslySetInnerHTML={{ __html: THEME_ICONS[pref] }} />
+            {THEME_ICONS[pref]}
           </span>
         </motion.button>
       ))}

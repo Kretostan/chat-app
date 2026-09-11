@@ -3,7 +3,7 @@ import type { BroadcastMessage, PaginatedRooms, PublicUser } from "shared";
 import Arrow from "@/assets/arrow-narrow.svg?react";
 import MessageBubble from "@/components/app/messages/MessageBubble";
 import MessageInput from "@/components/app/messages/MessageInput";
-import { MessageListSkeleton as SkeletonList } from "@/components/app/messages/Skeleton";
+import { MessageListSkeleton } from "@/components/app/messages/Skeleton";
 import { useMobile } from "@/hooks/useMobile";
 import { useWebSocket } from "@/hooks/useWebSocket";
 
@@ -34,7 +34,7 @@ export default function Content({
     {},
   );
   const [loading, setLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(false);
+  const [_hasMore, setHasMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Scroll refs
@@ -44,7 +44,36 @@ export default function Content({
   const messageIds = useRef(new Map<string, BroadcastMessage>());
 
   // Sending status (which optimistic messages are still pending)
-  const [sendingSet, setSendingSet] = useState<Set<string>>(new Set());
+  const [_sendingSet, setSendingSet] = useState<Set<string>>(new Set());
+
+  const aggregateByDate = useCallback((messagesList: BroadcastMessage[]) => {
+    const aggregated: Record<string, BroadcastMessage[]> = {};
+    for (const msg of messagesList) {
+      const dateKey = new Date(msg.createdAt).toISOString().slice(0, 10);
+      if (!aggregated[dateKey]) aggregated[dateKey] = [];
+      aggregated[dateKey].push(msg);
+    }
+
+    const sortedKeys = Object.keys(aggregated).sort((a, b) => {
+      return new Date(b).getTime() - new Date(a).getTime();
+    });
+
+    const reversedKeys = sortedKeys.reverse();
+    for (const key of reversedKeys) {
+      aggregated[key].sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      );
+    }
+
+    return aggregated;
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
+    }
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -67,11 +96,11 @@ export default function Content({
     }
 
     fetchMessages();
-  }, [roomId]);
+  }, [roomId, aggregateByDate]);
 
   useEffect(() => {
     if (!isManuallyScrolling) scrollToBottom();
-  }, [isManuallyScrolling]);
+  }, [isManuallyScrolling, scrollToBottom]);
 
   // WebSocket updates
   useEffect(() => {
@@ -110,12 +139,6 @@ export default function Content({
 
     return unsubscribe;
   }, [ws, roomId]);
-
-  const scrollToBottom = useCallback(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
-    }
-  }, []);
 
   const handleSend = async (msgText: string) => {
     const clientMessageId = `optimistic_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
@@ -177,29 +200,6 @@ export default function Content({
     (msg: BroadcastMessage): boolean => msg.userId === user.id,
     [user.id],
   );
-
-  function aggregateByDate(messagesList: BroadcastMessage[]) {
-    const aggregated: Record<string, BroadcastMessage[]> = {};
-    for (const msg of messagesList) {
-      const dateKey = new Date(msg.createdAt).toISOString().slice(0, 10);
-      if (!aggregated[dateKey]) aggregated[dateKey] = [];
-      aggregated[dateKey].push(msg);
-    }
-
-    const sortedKeys = Object.keys(aggregated).sort((a, b) => {
-      return new Date(b).getTime() - new Date(a).getTime();
-    });
-
-    const reversedKeys = sortedKeys.reverse();
-    for (const key of reversedKeys) {
-      aggregated[key].sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      );
-    }
-
-    return aggregated;
-  }
 
   function formatMessageDate(key: string): string {
     const today = new Date().toISOString().slice(0, 10);
@@ -320,7 +320,7 @@ export default function Content({
       >
         <div className="flex flex-col flex-1 px-4 py-3">
           {loading ? (
-            <SkeletonList count={8} />
+            <MessageListSkeleton count={8} />
           ) : Object.keys(messages).length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center">
               <p
@@ -350,9 +350,12 @@ export default function Content({
                   {/* Messages for this date */}
                   <ul className="flex flex-col gap-0.5 mb-1">
                     {dateMessages.map((msg) => {
-                      const isSending = sendingSet.has(
-                        msg.clientMessageId || "",
-                      );
+                      {
+                        /* TODO: Wprowadzić isSending */
+                        /* const isSending = sendingSet.has( */
+                        /*   msg.clientMessageId || "", */
+                        /* ); */
+                      }
                       return (
                         <li
                           key={msg.id || msg.clientMessageId || Math.random()}

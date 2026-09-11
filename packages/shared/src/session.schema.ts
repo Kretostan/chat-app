@@ -8,3 +8,5 @@ export const sessionSchema = z.object({
   lastUsedAt: z.iso.datetime(),
   sessionUuid: z.string().nullable(),
 });
+
+export type SessionInfo = z.infer<typeof sessionSchema>;

@@ -122,3 +122,4 @@ export const createRoomResultSchema = z.discriminatedUnion("status", [
 
 export type CreateRoomValues = z.infer<typeof createRoomSchema>;
 export type CreateRoomResult = z.infer<typeof createRoomResultSchema>;
+export type RoomMessage = z.infer<typeof messageSchema>;

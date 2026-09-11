@@ -62,7 +62,9 @@ export function useWebSocket() {
       handlersRef.current.set(event, new Set());
     }
     handlersRef.current.get(event)?.add(handler);
-    return () => handlersRef.current.get(event)?.delete(handler);
+    return () => {
+      handlersRef.current.get(event)?.delete(handler);
+    };
   }, []);
 
   const send = useCallback((event: string, data: any): Promise<any> => {

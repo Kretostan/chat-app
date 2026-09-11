@@ -10,8 +10,8 @@ const MessageBubbleSkeleton = () => (
 
 const MessageListSkeleton = ({ count = 8 }: { count?: number }) => (
   <div className="flex flex-col flex-1 p-4">
-    {Array.from({ length: count }, (_, i) => (
-      <MessageBubbleSkeleton key={i} />
+    {Array.from({ length: count }, () => (
+      <MessageBubbleSkeleton key={crypto.randomUUID()} />
     ))}
   </div>
 );

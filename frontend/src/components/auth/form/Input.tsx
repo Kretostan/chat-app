@@ -1,11 +1,10 @@
-const Input = ({
-  name,
-  children,
-  ...props
-}: {
+interface InputProps extends React.ComponentPropsWithoutRef<"input"> {
   name: string;
   children: React.ReactNode;
-}) => (
+}
+
+const Input = ({ name, children, ...props }: InputProps) => (
+  // FIX: Jeśli type === "password" to ustawić min/max, czy juz backend to ogarnia?
   <>
     <label
       htmlFor={name}
