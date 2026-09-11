@@ -64,11 +64,6 @@ function RouteComponent() {
     router.navigate({ to: "/" });
   };
 
-  const handleLogoutMobile = async () => {
-    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-    router.navigate({ to: "/" });
-  };
-
   const handleRoomSelect = useCallback((id: number) => {
     setSelectedRoomId(id);
     // On mobile, closing menu happens via Content's back button
