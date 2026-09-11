@@ -62,7 +62,7 @@ function ErrorMessage({
   text: string;
   onDismiss?: () => void;
 }) {
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     if (!onDismiss) return;
@@ -109,7 +109,7 @@ function ErrorMessage({
 
 function CurrentDeviceCard({ device }: { device: SessionInfo }) {
   let icon: React.ReactNode;
-  switch (device.deviceName.split[1]) {
+  switch (device.deviceName) {
     case "Android":
       icon = "📱";
       break;
