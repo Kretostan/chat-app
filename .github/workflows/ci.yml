@@ -138,8 +138,8 @@ jobs:
         env:
           IMAGE_SHA: ${{ github.sha }}
         run: |
-          docker compose -p chat-app -f compose.ci.yaml pull
-          docker compose -p chat-app -f compose.ci.yaml up -d
+          docker compose -p chat-app -f compose.yaml -f compose.ci.yaml pull
+          docker compose -p chat-app -f compose.yaml -f compose.ci.yaml up -d
           sleep 5
           docker compose ps
           curl --fail http://localhost:3000/health || exit 1
