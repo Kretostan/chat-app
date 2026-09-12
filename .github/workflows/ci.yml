@@ -146,4 +146,4 @@ jobs:
 
       - name: Clean up
         if: always()
-        run: docker compose -p chat-app -f compose.ci.yaml down
+        run: docker compose -p chat-app -f compose.yaml -f compose.ci.yaml down
