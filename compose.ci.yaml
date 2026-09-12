@@ -3,5 +3,3 @@ services:
     image: ghcr.io/kretostan/chat-app/backend:${IMAGE_SHA}
   frontend:
     image: ghcr.io/kretostan/chat-app/frontend:${IMAGE_SHA}
-    depends_on:
-      backend: service_healthy
